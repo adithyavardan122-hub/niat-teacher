@@ -209,16 +209,42 @@ export function StudentLogin({
 
     setLoading(true);
     try {
-      // Verify with Firebase Confirmation if available
+      // 1. Verify with Firebase Confirmation if live session exists
       if (confirmationResult && confirmationResult.confirm) {
         try {
-          await confirmationResult.confirm(cleanOtp);
+          const result = await confirmationResult.confirm(cleanOtp);
+          const idToken = await result.user.getIdToken();
+
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL || apiBaseUrl}/api/auth/profile`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+
+          const responseText = await response.text();
+          let profileData;
+          try {
+            profileData = JSON.parse(responseText);
+          } catch {
+            throw new Error("Backend returned an empty or invalid JSON response");
+          }
+
+          if (!response.ok) {
+            throw new Error(profileData.message || "Login failed");
+          }
+
+          console.log("Verified Firebase user profile:", profileData.user);
         } catch (fbVerErr) {
-          console.info('Firebase code verification check:', fbVerErr.message);
+          console.info('Firebase verification handler:', fbVerErr.message);
         }
       }
 
-      // Verify and persist student in MongoDB
+      // 2. Verify and persist student into MongoDB Atlas
       const res = await fetch(`${apiBaseUrl}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -235,7 +261,7 @@ export function StudentLogin({
         throw new Error(data.error || 'Invalid OTP code. Please check and try again.');
       }
 
-      setSuccessMsg('Identity verified! Welcome to NIAT Academic Portal.');
+      setSuccessMsg('Login successful!');
       if (onLoginSuccess && data.student) {
         onLoginSuccess(data.student);
       }
@@ -252,7 +278,39 @@ export function StudentLogin({
     setLoading(true);
     setErrorMsg('');
     try {
-      await authenticateWithFirebaseToken(FIREBASE_AUTH_TOKEN);
+      const fbUser = await authenticateWithFirebaseToken(FIREBASE_AUTH_TOKEN);
+      let idToken = FIREBASE_AUTH_TOKEN;
+      if (fbUser && fbUser.getIdToken) {
+        try {
+          idToken = await fbUser.getIdToken();
+        } catch {
+          // fallback to token
+        }
+      }
+
+      // Verify token through backend route /api/auth/profile
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || apiBaseUrl}/api/auth/profile`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const responseText = await response.text();
+      let profileData;
+      try {
+        profileData = JSON.parse(responseText);
+      } catch {
+        throw new Error("Backend returned an empty or invalid JSON response");
+      }
+
+      if (!response.ok) {
+        throw new Error(profileData.message || "Login failed");
+      }
 
       const targetPhone = phone.length === 10 ? phone : '9876543210';
       const targetName = name.trim() || 'Aarav Patel';
@@ -270,8 +328,12 @@ export function StudentLogin({
       });
 
       const data = await res.json();
+      setSuccessMsg("Login successful!");
       if (data?.student && onLoginSuccess) {
-        onLoginSuccess(data.student);
+        onLoginSuccess({
+          ...data.student,
+          firebaseUid: profileData.user?.uid || 'firebase_user_id',
+        });
       }
     } catch (err) {
       setErrorMsg(err.message || 'Firebase token verification failed.');

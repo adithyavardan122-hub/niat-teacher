@@ -13,6 +13,8 @@ import {
   getAllStudentsService,
   storeStudentService,
 } from './authService.js';
+import authRoutes from './routes/authRoutes.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -279,6 +281,8 @@ app.post('/api/admin/update-teacher', (req, res) => {
 });
 
 // ─── AUTHENTICATION & MONGODB ROUTES ────────────────────────────────────────
+app.use('/api/auth', authRoutes);
+
 
 // Check MongoDB and Auth Status
 app.get('/api/auth/status', (_req, res) => {
