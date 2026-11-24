@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { RecaptchaVerifier } from 'firebase/auth';
+import { auth } from './firebase.js';
 import {
   GraduationCap,
   Phone,
@@ -17,7 +19,6 @@ import {
 } from './icons.jsx';
 import {
   firebaseConfig,
-  createRecaptchaVerifier,
   sendFirebasePhoneOtp,
   sendEmailSignInLink,
   completeEmailSignIn,
@@ -54,9 +55,8 @@ export function StudentLogin({
   const [resendTimer, setResendTimer]         = useState(0);
   const [confirmationResult, setConfirmationResult] = useState(null);
   const otpSentRef      = useRef(false);
-  const recaptchaRef    = useRef(null);
   const verifierRef     = useRef(null);
-  const renderPromiseRef = useRef(null);
+  const isRenderedRef   = useRef(false);  // guards StrictMode double-mount
 
   // ── email specific ─────────────────────────────────────────────────────────
   const [email, setEmail]           = useState('');
@@ -73,12 +73,57 @@ export function StudentLogin({
     'http://localhost:5000'
   ).replace(/\/+$/, '');
 
-  // ── reCAPTCHA cleanup on unmount ───────────────────────────────────────────
+  // ── reCAPTCHA setup and cleanup ───────────────────────────────────────────
+  /**
+   * setupRecaptcha — StrictMode-safe
+   *
+   * StrictMode mounts → cleanup → remounts in dev, which means the cleanup
+   * fires before the second mount. We track whether we have a live, rendered
+   * verifier in `isRenderedRef` and in `verifierRef`. On every call we:
+   *   1. Clear + destroy any stale instance first (clears the DOM node too).
+   *   2. Create a fresh RecaptchaVerifier and render it.
+   * This is safe to call multiple times; Firebase itself is idempotent after
+   * the DOM node is cleared.
+   */
+  const setupRecaptcha = async () => {
+    // Destroy any previous instance so the DOM node is clean
+    if (verifierRef.current) {
+      try { verifierRef.current.clear(); } catch {}
+      verifierRef.current = null;
+      isRenderedRef.current = false;
+    }
+
+    // Also wipe the container's innerHTML so Firebase doesn't see a stale widget
+    const container = document.getElementById('recaptcha-container');
+    if (container) container.innerHTML = '';
+
+    verifierRef.current = new RecaptchaVerifier(
+      auth,
+      'recaptcha-container',
+      {
+        size: 'normal',
+        callback: () => {},            // reCAPTCHA solved
+        'expired-callback': () => {    // token expired — force re-setup on next send
+          isRenderedRef.current = false;
+          verifierRef.current = null;
+        },
+      }
+    );
+
+    await verifierRef.current.render();
+    isRenderedRef.current = true;
+
+    return verifierRef.current;
+  };
+
+  // Cleanup on unmount (also fires between StrictMode mount cycles in dev)
   useEffect(() => {
     return () => {
-      verifierRef.current?.clear();
-      verifierRef.current      = null;
-      renderPromiseRef.current = null;
+      if (verifierRef.current) {
+        try { verifierRef.current.clear(); } catch {}
+        verifierRef.current = null;
+        isRenderedRef.current = false;
+      }
     };
   }, []);
 
@@ -119,8 +164,10 @@ export function StudentLogin({
     otpSentRef.current = false;
     if (verifierRef.current) {
       try { verifierRef.current.clear(); } catch {}
-      verifierRef.current      = null;
-      renderPromiseRef.current = null;
+      verifierRef.current = null;
+      isRenderedRef.current = false;
+      const container = document.getElementById('recaptcha-container');
+      if (container) container.innerHTML = '';
     }
   };
 
@@ -156,26 +203,31 @@ export function StudentLogin({
    * After Firebase signs the user in (phone or email), verify the token
    * with the backend and persist the student record.
    */
-  const finalizeLogin = async (firebaseUser) => {
-    const idToken = await firebaseUser.getIdToken();
+  const finalizeLogin = async (firebaseUser, preloadedProfileUser) => {
+    let profileData = null;
 
-    // 1. Verify token with backend
-    const profileRes = await fetch(`${API_URL}/api/auth/profile`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-    });
+    if (preloadedProfileUser) {
+      profileData = { user: preloadedProfileUser };
+    } else {
+      const idToken = await firebaseUser.getIdToken();
 
-    const profileText = await profileRes.text();
-    let profileData;
-    try {
-      profileData = JSON.parse(profileText);
-    } catch {
-      throw new Error(
-        `Backend returned a non-JSON response (status ${profileRes.status}). ` +
-        `Make sure the backend is running at ${API_URL}`
-      );
+      // 1. Verify token with backend
+      const profileRes = await fetch(`${API_URL}/api/auth/profile`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+      });
+
+      const profileText = await profileRes.text();
+      try {
+        profileData = JSON.parse(profileText);
+      } catch {
+        throw new Error(
+          `Backend returned a non-JSON response (status ${profileRes.status}). ` +
+          `Make sure the backend is running at ${API_URL}`
+        );
+      }
+      if (!profileRes.ok) throw new Error(profileData?.message || `Backend error: ${profileRes.status}`);
     }
-    if (!profileRes.ok) throw new Error(profileData?.message || `Backend error: ${profileRes.status}`);
 
     // 2. Persist student
     const cleanPhone  = phone.replace(/\D/g, '');
@@ -196,12 +248,12 @@ export function StudentLogin({
 
     const finalStudent = {
       ...(studentData || {}),
-      name:        cleanName  || profileData.user?.email?.split('@')[0] || 'Student',
+      name:        cleanName  || profileData?.user?.email?.split('@')[0] || 'Student',
       niatId:      cleanNiatId,
       phone:       cleanPhone,
-      email:       profileData.user?.email  || email || '',
-      firebaseUid: profileData.user?.uid    || firebaseUser.uid,
-      phoneNumber: profileData.user?.phoneNumber || (cleanPhone ? `+91${cleanPhone}` : ''),
+      email:       profileData?.user?.email  || email || '',
+      firebaseUid: profileData?.user?.uid    || firebaseUser.uid,
+      phoneNumber: profileData?.user?.phoneNumber || (cleanPhone ? `+91${cleanPhone}` : ''),
     };
 
     setSuccessMsg('Login successful! Redirecting...');
@@ -252,13 +304,8 @@ export function StudentLogin({
     otpSentRef.current = false;
 
     try {
-      if (!verifierRef.current) {
-        verifierRef.current      = createRecaptchaVerifier(recaptchaRef.current, 'invisible');
-        renderPromiseRef.current = verifierRef.current.render();
-      }
-      await renderPromiseRef.current;
-
-      const result = await sendFirebasePhoneOtp(`+91${cleanPhone}`, verifierRef.current);
+      const appVerifier = await setupRecaptcha();
+      const result = await sendFirebasePhoneOtp(`+91${cleanPhone}`, appVerifier);
 
       setConfirmationResult(result);
       otpSentRef.current = true;
@@ -267,6 +314,10 @@ export function StudentLogin({
       setResendTimer(60);
     } catch (err) {
       console.error('[SendOTP]', err);
+      if (verifierRef.current) {
+        try { verifierRef.current.clear(); } catch {}
+        verifierRef.current = null;
+      }
       const msg =
         err.code === 'auth/invalid-phone-number'  ? 'Invalid phone number. Enter a valid 10-digit Indian number.' :
         err.code === 'auth/too-many-requests'      ? 'Too many requests. Wait a few minutes and try again.' :
@@ -274,10 +325,6 @@ export function StudentLogin({
         err.code === 'auth/quota-exceeded'         ? 'SMS quota exceeded. Contact the administrator.' :
         err.message || 'Failed to send OTP. Please try again.';
       setErrorMsg(msg);
-      if (verifierRef.current) {
-        try { verifierRef.current.clear(); } catch {}
-        verifierRef.current = renderPromiseRef.current = null;
-      }
     } finally {
       setLoading(false);
     }
@@ -293,10 +340,39 @@ export function StudentLogin({
 
     setLoading(true);
     try {
-      const credential = await confirmationResult.confirm(otpCode.trim());
-      await finalizeLogin(credential.user);
+      console.log("Step 1: Starting OTP verification");
+      const result = await confirmationResult.confirm(otpCode.trim());
+      console.log("Step 2: Firebase OTP verified", result.user.uid);
+
+      const idToken = await result.user.getIdToken();
+      console.log("Step 3: Firebase token received");
+
+      const response = await fetch(
+        `${API_URL}/api/auth/profile`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+      console.log("Step 4: Backend status:", response.status);
+
+      const text = await response.text();
+      console.log("Step 5: Backend response:", text);
+
+      if (!response.ok) {
+        throw new Error(`Backend error ${response.status}: ${text}`);
+      }
+      if (!text) {
+        throw new Error("Backend returned an empty response");
+      }
+
+      const data = JSON.parse(text);
+
+      await finalizeLogin(result.user, data.user);
     } catch (err) {
-      console.error('[VerifyOTP]', err);
+      console.error("LOGIN ERROR:", err);
       const msg =
         err.code === 'auth/invalid-verification-code' ? 'Incorrect OTP. Check the SMS code.' :
         err.code === 'auth/code-expired'              ? 'OTP expired. Go back and request a new one.' :
@@ -516,9 +592,6 @@ export function StudentLogin({
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#070b14] relative min-h-[calc(100vh-60px)]">
 
-      {/* reCAPTCHA container — Firebase attaches the invisible widget here */}
-      <div ref={recaptchaRef} id="recaptcha-container"></div>
-
       <div className="w-full max-w-md glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-2xl relative z-10">
 
         {/* ── Top badge ─────────────────────────────────────────────────── */}
@@ -644,6 +717,11 @@ export function StudentLogin({
                   <p className="text-[11px] text-slate-500 mt-1">
                     Firebase sends a real SMS to this number.
                   </p>
+                </div>
+
+                {/* reCAPTCHA widget container (visible verification box) */}
+                <div className="flex justify-center my-3 overflow-hidden rounded-lg">
+                  <div id="recaptcha-container"></div>
                 </div>
 
                 <button
