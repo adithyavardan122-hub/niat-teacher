@@ -31,8 +31,9 @@ router.get('/profile', verifyToken, (req, res) => {
   return res.status(200).json({
     success: true,
     user: {
-      uid: req.user.uid,
-      phoneNumber: req.user.phone_number || req.user.phoneNumber || null,
+      uid:         req.user.uid,
+      phoneNumber: req.user.phone_number  || req.user.phoneNumber || null,
+      email:       req.user.email         || null,
     },
   });
 });
