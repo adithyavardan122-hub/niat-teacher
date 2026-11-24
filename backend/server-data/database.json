@@ -1,0 +1,1433 @@
+{
+  "subjects": [
+    {
+      "id": "programming",
+      "name": "Computer Programming",
+      "teacherName": "Atifa Mam",
+      "teacherRole": "Python & Software Systems Faculty",
+      "teacherImage": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600",
+      "description": "Master Computer Programming with Python from fundamentals to advanced data structures, debugging, algorithmic complexity, and standard libraries.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "hpp4J3VqNfWAUOO0d1Us",
+        "voiceName": "Atifa Mam (Bella Cleared)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/atifa_mam_python_voice.mp4"
+      },
+      "sections": [
+        "Programming with Python",
+        "Coding Practice Walkthrough – Part 1",
+        "Leveraging Gen AI for Accelerated Learning",
+        "Variables and Data Types",
+        "Sequence of Instructions",
+        "Input and Output Basics",
+        "How to Debug Your Code?",
+        "Type Conversions",
+        "Relational Operators",
+        "Logical Operators",
+        "Conditional Statements",
+        "Nested Conditional Statements",
+        "Loops",
+        "Understanding Coding Question Formats",
+        "For Loop",
+        "String Methods",
+        "Nested Loops",
+        "Loop Control Statements",
+        "Comparing Strings & Naming Variables",
+        "Lists",
+        "Lists and Strings",
+        "Functions",
+        "Built-in Functions",
+        "List Methods and Tuples",
+        "Sets and Set Operations",
+        "Dictionaries",
+        "Python Standard Library"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "prog-1",
+          "title": "Programming with Python - Full Beginner Course",
+          "youtubeId": "_uQrJ0TkZlc",
+          "topic": "Programming with Python",
+          "duration": "45:30",
+          "facultyName": "Atifa Mam",
+          "summary": "Introduction to Python language syntax, interpreter execution model, VS Code setup, and writing your first clean script.",
+          "searchQuery": "Programming with Python for beginners full course"
+        },
+        {
+          "id": "prog-2",
+          "title": "Coding Practice Walkthrough – Part 1",
+          "youtubeId": "kqtD5dpn9C8",
+          "topic": "Coding Practice Walkthrough – Part 1",
+          "duration": "38:15",
+          "facultyName": "Atifa Mam",
+          "summary": "Hands-on walkthrough of beginner coding challenges, reading problem statements, writing test assertions, and handling edge cases.",
+          "searchQuery": "Python coding practice problems walkthrough part 1"
+        },
+        {
+          "id": "prog-3",
+          "title": "Leveraging Gen AI for Accelerated Learning in Python",
+          "youtubeId": "aircAruvnKk",
+          "topic": "Leveraging Gen AI for Accelerated Learning",
+          "duration": "25:40",
+          "facultyName": "Atifa Mam",
+          "summary": "How to use AI assistants to explain stack traces, refactor code, generate dry-run diagrams, and master programming concepts 3x faster.",
+          "searchQuery": "How to use Gen AI ChatGPT Claude to learn python coding faster"
+        },
+        {
+          "id": "prog-4",
+          "title": "Variables and Data Types in Python",
+          "youtubeId": "cKxRvEZd3Mw",
+          "topic": "Variables and Data Types",
+          "duration": "28:50",
+          "facultyName": "Atifa Mam",
+          "summary": "Deep dive into dynamic typing, integers, floats, booleans, string objects, variable memory references, and id() function.",
+          "searchQuery": "Python variables and data types tutorial"
+        },
+        {
+          "id": "prog-5",
+          "title": "Sequence of Instructions & Execution Order",
+          "youtubeId": "7lmCu8wz8ro",
+          "topic": "Sequence of Instructions",
+          "duration": "21:10",
+          "facultyName": "Atifa Mam",
+          "summary": "Understanding statement-by-statement sequential execution, instruction pointers, side-effects, and order of operations.",
+          "searchQuery": "Python sequence of instructions and execution flow"
+        },
+        {
+          "id": "prog-6",
+          "title": "Input and Output Basics (print & input)",
+          "youtubeId": "mDKM-JtUhhc",
+          "topic": "Input and Output Basics",
+          "duration": "24:35",
+          "facultyName": "Atifa Mam",
+          "summary": "Mastering user input reading with input(), formatting output strings with f-strings, sep and end parameters in print().",
+          "searchQuery": "Python input and output print function formatting"
+        },
+        {
+          "id": "prog-7",
+          "title": "How to Debug Your Code Like a Pro",
+          "youtubeId": "2mgkJkYk1k8",
+          "topic": "How to Debug Your Code?",
+          "duration": "32:15",
+          "facultyName": "Atifa Mam",
+          "summary": "Interpreting Python tracebacks, using breakpoints in VS Code, step-over/step-into debugging, and isolating logic errors.",
+          "searchQuery": "How to debug python code in VS Code step by step"
+        },
+        {
+          "id": "prog-8",
+          "title": "Type Conversions (Implicit & Explicit Casting)",
+          "youtubeId": "WcqJpG2sZt8",
+          "topic": "Type Conversions",
+          "duration": "19:40",
+          "facultyName": "Atifa Mam",
+          "summary": "Converting between int, float, str, and bool. Avoiding ValueError exceptions and understanding implicit type promotion.",
+          "searchQuery": "Python type conversion and type casting tutorial"
+        },
+        {
+          "id": "prog-9",
+          "title": "Relational Operators in Python",
+          "youtubeId": "jNqQh7p2-Bw",
+          "topic": "Relational Operators",
+          "duration": "18:25",
+          "facultyName": "Atifa Mam",
+          "summary": "Mastering comparison operators (==, !=, <, >, <=, >=), identity check (is vs ==), and boolean expressions.",
+          "searchQuery": "Python relational and comparison operators"
+        },
+        {
+          "id": "prog-10",
+          "title": "Logical Operators (and, or, not) & Truth Tables",
+          "youtubeId": "fVz_kF_q05U",
+          "topic": "Logical Operators",
+          "duration": "22:15",
+          "facultyName": "Atifa Mam",
+          "summary": "Compound conditional logic using and, or, and not. Short-circuit evaluation behavior in Python.",
+          "searchQuery": "Python logical operators and or not"
+        },
+        {
+          "id": "prog-11",
+          "title": "Conditional Statements (if, elif, else)",
+          "youtubeId": "DZwmZ8Usvnk",
+          "topic": "Conditional Statements",
+          "duration": "30:45",
+          "facultyName": "Atifa Mam",
+          "summary": "Branching control flow, syntax rules, 4-space indentation discipline, and avoiding redundant elif checks.",
+          "searchQuery": "Python conditional statements if elif else"
+        },
+        {
+          "id": "prog-12",
+          "title": "Nested Conditional Statements & Complex Decisions",
+          "youtubeId": "r_MboZNe3GM",
+          "topic": "Nested Conditional Statements",
+          "duration": "27:10",
+          "facultyName": "Atifa Mam",
+          "summary": "Writing multi-tier decision trees, guarding clauses, and refactoring deeply nested conditions into clean logical gates.",
+          "searchQuery": "Python nested if else statements tutorial"
+        },
+        {
+          "id": "prog-13",
+          "title": "Introduction to Loops & While Loop Mastery",
+          "youtubeId": "6iF8Xb7Z3wQ",
+          "topic": "Loops",
+          "duration": "35:00",
+          "facultyName": "Atifa Mam",
+          "summary": "Iterative execution, loop initialization, termination condition checks, incrementing variables, and avoiding infinite loops.",
+          "searchQuery": "Python while loops complete guide"
+        },
+        {
+          "id": "prog-14",
+          "title": "Understanding Coding Question Formats in Placement Exams",
+          "youtubeId": "8ext9G7xspg",
+          "topic": "Understanding Coding Question Formats",
+          "duration": "34:20",
+          "facultyName": "Atifa Mam",
+          "summary": "Analyzing LeetCode, HackerRank, and campus test formats: standard input parsing, time limits, and hidden test suite checks.",
+          "searchQuery": "Understanding competitive programming problem formats and input output"
+        },
+        {
+          "id": "prog-15",
+          "title": "For Loops & the range() Function",
+          "youtubeId": "OnDr4Jg6KYI",
+          "topic": "For Loop",
+          "duration": "31:40",
+          "facultyName": "Atifa Mam",
+          "summary": "Definite iteration, range(start, stop, step), iterating over iterables, and index tracking with enumerate().",
+          "searchQuery": "Python for loop and range function tutorial"
+        },
+        {
+          "id": "prog-16",
+          "title": "String Methods, Slicing & Immutability",
+          "youtubeId": "k9TUPpGqYTo",
+          "topic": "String Methods",
+          "duration": "29:55",
+          "facultyName": "Atifa Mam",
+          "summary": "String indexing, step slicing [::-1], strip(), lower(), upper(), find(), replace(), and format() methods.",
+          "searchQuery": "Python string methods and string slicing complete guide"
+        },
+        {
+          "id": "prog-17",
+          "title": "Nested Loops & Matrix / Pattern Algorithms",
+          "youtubeId": "1F_Ogq45UQU",
+          "topic": "Nested Loops",
+          "duration": "33:15",
+          "facultyName": "Atifa Mam",
+          "summary": "Row-by-column iteration, printing pyramid and diamond patterns, and calculating nested loop Big-O time complexity.",
+          "searchQuery": "Python nested loops pattern programs tutorial"
+        },
+        {
+          "id": "prog-18",
+          "title": "Loop Control Statements (break, continue, pass)",
+          "youtubeId": "yCZBnjF4_tU",
+          "topic": "Loop Control Statements",
+          "duration": "23:50",
+          "facultyName": "Atifa Mam",
+          "summary": "Early loop exit with break, skipping iterations with continue, placeholder pass statements, and loop-else blocks.",
+          "searchQuery": "Python loop control statements break continue pass"
+        },
+        {
+          "id": "prog-19",
+          "title": "Comparing Strings & Naming Variables (PEP8 Guidelines)",
+          "youtubeId": "pTFZhRk_c2I",
+          "topic": "Comparing Strings & Naming Variables",
+          "duration": "20:30",
+          "facultyName": "Atifa Mam",
+          "summary": "Lexicographical string comparison, case-insensitive checks, and industry clean code standards (snake_case vs CamelCase).",
+          "searchQuery": "Python string comparison and PEP8 naming conventions"
+        },
+        {
+          "id": "prog-20",
+          "title": "Python Lists: Creation, Indexing & Modification",
+          "youtubeId": "ohCDWZgNIU0",
+          "topic": "Lists",
+          "duration": "36:20",
+          "facultyName": "Atifa Mam",
+          "summary": "Dynamic arrays in Python, negative indices, mutating list elements, memory layout, and list traversals.",
+          "searchQuery": "Python lists tutorial creation indexing operations"
+        },
+        {
+          "id": "prog-21",
+          "title": "Lists and Strings Integration (split & join)",
+          "youtubeId": "W8KRzm-HUcc",
+          "topic": "Lists and Strings",
+          "duration": "26:45",
+          "facultyName": "Atifa Mam",
+          "summary": "Converting sentences to word lists with .split(), rejoining tokens with .join(), and parsing CSV lines.",
+          "searchQuery": "Python split and join methods strings and lists"
+        },
+        {
+          "id": "prog-22",
+          "title": "User-Defined Functions (def, return, parameters)",
+          "youtubeId": "9Os0o3wzS_I",
+          "topic": "Functions",
+          "duration": "39:10",
+          "facultyName": "Atifa Mam",
+          "summary": "Modular program architecture, parameter passing, return statements, local vs global scope, and default arguments.",
+          "searchQuery": "Python functions tutorial def arguments return values"
+        },
+        {
+          "id": "prog-23",
+          "title": "Python Built-in Functions Masterclass",
+          "youtubeId": "XU_eT9-2w20",
+          "topic": "Built-in Functions",
+          "duration": "28:15",
+          "facultyName": "Atifa Mam",
+          "summary": "Essential built-ins: len(), sum(), min(), max(), abs(), sorted(), map(), filter(), and zip().",
+          "searchQuery": "Python built-in functions complete tutorial"
+        },
+        {
+          "id": "prog-24",
+          "title": "List Methods and Tuples (Mutable vs Immutable)",
+          "youtubeId": "niGLS6w7BQI",
+          "topic": "List Methods and Tuples",
+          "duration": "31:05",
+          "facultyName": "Atifa Mam",
+          "summary": "append, extend, insert, remove, pop, sort vs sorted, and tuple immutability as dictionary keys.",
+          "searchQuery": "Python list methods and tuples tutorial mutable vs immutable"
+        },
+        {
+          "id": "prog-25",
+          "title": "Sets and Set Operations in Python",
+          "youtubeId": "sBvaPopWOmQ",
+          "topic": "Sets and Set Operations",
+          "duration": "25:30",
+          "facultyName": "Atifa Mam",
+          "summary": "Unique elements collection, O(1) membership testing, union (|), intersection (&), difference (-), and symmetric difference.",
+          "searchQuery": "Python sets and set operations tutorial"
+        },
+        {
+          "id": "prog-26",
+          "title": "Python Dictionaries (Hash Maps) & Methods",
+          "youtubeId": "XCcpzWs-9vS",
+          "topic": "Dictionaries",
+          "duration": "37:45",
+          "facultyName": "Atifa Mam",
+          "summary": "Key-value mappings, .get() default values, .keys(), .values(), .items(), dictionary comprehensions, and word frequency algorithms.",
+          "searchQuery": "Python dictionaries tutorial keys values items methods"
+        },
+        {
+          "id": "prog-27",
+          "title": "Python Standard Library (math, random, os, sys)",
+          "youtubeId": "C-gEQdGVXbk",
+          "topic": "Python Standard Library",
+          "duration": "35:20",
+          "facultyName": "Atifa Mam",
+          "summary": "Importing modules, leveraging standard math, random, sys, datetime, and os utilities for real-world projects.",
+          "searchQuery": "Python standard library modules math random os sys tutorial"
+        }
+      ]
+    },
+    {
+      "id": "webdev",
+      "name": "Web Application Development",
+      "teacherName": "Sujan Sir",
+      "teacherRole": "Lead Web & Full-Stack Architecture Faculty",
+      "teacherImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600",
+      "description": "Build production-grade responsive web applications with semantic HTML5, modern CSS3 (Flexbox & Grid), Tailwind CSS, and frontend architecture.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+        "voiceName": "Sujan Sir (Roger Cleared)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/sujan_sir_cleared_voice.mp3"
+      },
+      "sections": [
+        "Introduction to GenAI in Web Development",
+        "Getting Started with Web Development",
+        "Introduction to HTML",
+        "Leveraging GenAI for Accelerated Learning",
+        "Introduction to CSS | Part 1",
+        "Introduction to CSS | Part 2",
+        "Introduction to CSS | Part 3",
+        "Introduction to CSS Box Model | Part 1",
+        "Introduction to CSS Box Model | Part 2",
+        "Coding Platform Walkthrough",
+        "HTML Void Elements & Lists",
+        "Website: Behind the Scenes",
+        "HTML Hyperlinks",
+        "Introduction to HTML5",
+        "HTML Semantic Elements",
+        "More CSS Concepts",
+        "CSS Selectors & Specificity",
+        "Sizing Elements and Box Sizing",
+        "Introduction to CSS Flexbox",
+        "CSS Flexbox & Media Queries",
+        "Flexbox Sizing & Building Web Applications",
+        "Building Web Applications II",
+        "CSS Grid I",
+        "CSS Grid II",
+        "CSS Positioning",
+        "Introduction to Tailwind CSS",
+        "Building Responsive Websites"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "web-1",
+          "title": "Introduction to GenAI in Web Development",
+          "youtubeId": "lC2rQ2jJ3cM",
+          "topic": "Introduction to GenAI in Web Development",
+          "duration": "26:30",
+          "facultyName": "Sujan Sir",
+          "summary": "How modern full-stack web developers use Generative AI tools (v0, GitHub Copilot, Cursor) to scaffold components and debug HTML/CSS.",
+          "searchQuery": "AI in web development tools Cursor v0 Copilot tutorial"
+        },
+        {
+          "id": "web-2",
+          "title": "Getting Started with Web Development in 2026",
+          "youtubeId": "mU6anWqZJcc",
+          "topic": "Getting Started with Web Development",
+          "duration": "33:15",
+          "facultyName": "Sujan Sir",
+          "summary": "Frontend roadmap, client-server model, browser rendering engines (Chromium/Gecko/WebKit), and development environment configuration.",
+          "searchQuery": "Web development roadmap for beginners full guide"
+        },
+        {
+          "id": "web-3",
+          "title": "Introduction to HTML - Document Structure & Tags",
+          "youtubeId": "qz0aGYrrlhU",
+          "topic": "Introduction to HTML",
+          "duration": "38:40",
+          "facultyName": "Sujan Sir",
+          "summary": "HTML boilerplate, <!DOCTYPE html>, head vs body, headings h1-h6, paragraphs, and browser DOM representation.",
+          "searchQuery": "HTML full course for beginners tutorial"
+        },
+        {
+          "id": "web-4",
+          "title": "Leveraging GenAI for Accelerated Learning in Web Design",
+          "youtubeId": "5p8x9Wn1VqE",
+          "topic": "Leveraging GenAI for Accelerated Learning",
+          "duration": "24:10",
+          "facultyName": "Sujan Sir",
+          "summary": "Prompting AI models to explain CSS layout bugs, generate semantic layouts, and write accessible ARIA attributes.",
+          "searchQuery": "How to use ChatGPT to learn web development HTML CSS"
+        },
+        {
+          "id": "web-5",
+          "title": "Introduction to CSS | Part 1 - Selectors & Styles",
+          "youtubeId": "1PnVor36_40",
+          "topic": "Introduction to CSS | Part 1",
+          "duration": "31:20",
+          "facultyName": "Sujan Sir",
+          "summary": "Connecting stylesheets (<link rel='stylesheet'>), element selectors, color formats (hex, rgb, hsl), and font-family basics.",
+          "searchQuery": "CSS tutorial for beginners part 1 selectors colors"
+        },
+        {
+          "id": "web-6",
+          "title": "Introduction to CSS | Part 2 - Typography & Text Effects",
+          "youtubeId": "yfoY53QXEnI",
+          "topic": "Introduction to CSS | Part 2",
+          "duration": "27:45",
+          "facultyName": "Sujan Sir",
+          "summary": "Font weights, line-height, letter-spacing, text-transform, text-align, and Google Fonts integration.",
+          "searchQuery": "CSS typography and text styling tutorial"
+        },
+        {
+          "id": "web-7",
+          "title": "Introduction to CSS | Part 3 - Backgrounds & Borders",
+          "youtubeId": "OXGznpKZ_sA",
+          "topic": "Introduction to CSS | Part 3",
+          "duration": "29:15",
+          "facultyName": "Sujan Sir",
+          "summary": "Linear and radial gradients, background-size (cover, contain), border-radius for rounded cards, and box-shadow styling.",
+          "searchQuery": "CSS backgrounds borders gradients and shadows tutorial"
+        },
+        {
+          "id": "web-8",
+          "title": "Introduction to CSS Box Model | Part 1 - Padding & Margin",
+          "youtubeId": "rIO5326FgPE",
+          "topic": "Introduction to CSS Box Model | Part 1",
+          "duration": "34:50",
+          "facultyName": "Sujan Sir",
+          "summary": "The fundamental CSS Box Model: content area, padding, border, margin collapse, and browser inspection tools.",
+          "searchQuery": "CSS Box Model explained margin padding border"
+        },
+        {
+          "id": "web-9",
+          "title": "Introduction to CSS Box Model | Part 2 - Box-Sizing",
+          "youtubeId": "nSst4-WbEZk",
+          "topic": "Introduction to CSS Box Model | Part 2",
+          "duration": "22:30",
+          "facultyName": "Sujan Sir",
+          "summary": "Why universal * { box-sizing: border-box; } is essential for responsive design. Preventing unexpected layout blowouts.",
+          "searchQuery": "CSS box sizing border box vs content box explained"
+        },
+        {
+          "id": "web-10",
+          "title": "Coding Platform & VS Code Dev Tools Walkthrough",
+          "youtubeId": "B-ytMSuwKA8",
+          "topic": "Coding Platform Walkthrough",
+          "duration": "25:10",
+          "facultyName": "Sujan Sir",
+          "summary": "Live Server extension, Emmet abbreviations (div.container>ul>li*5), Prettier code formatting, and Chrome DevTools Elements tab.",
+          "searchQuery": "VS Code setup for web development extensions and shortcuts"
+        },
+        {
+          "id": "web-11",
+          "title": "HTML Void Elements, Lists & Formatting Tags",
+          "youtubeId": "916GWv2304A",
+          "topic": "HTML Void Elements & Lists",
+          "duration": "28:40",
+          "facultyName": "Sujan Sir",
+          "summary": "Self-closing tags (img, input, hr, br), ordered lists <ol>, unordered lists <ul>, and definition lists <dl>.",
+          "searchQuery": "HTML lists and void elements tutorial"
+        },
+        {
+          "id": "web-12",
+          "title": "Website: Behind the Scenes (How Browsers Render Pages)",
+          "youtubeId": "e4S8AzNUWqI",
+          "topic": "Website: Behind the Scenes",
+          "duration": "30:20",
+          "facultyName": "Sujan Sir",
+          "summary": "DNS lookup, TCP handshake, HTTP request/response cycle, HTML tokenization, DOM + CSSOM = Render Tree, and painting.",
+          "searchQuery": "How browsers work DOM CSSOM render tree explained"
+        },
+        {
+          "id": "web-13",
+          "title": "HTML Hyperlinks & Navigation Architecture",
+          "youtubeId": "k7p_8rN30bM",
+          "topic": "HTML Hyperlinks",
+          "duration": "23:15",
+          "facultyName": "Sujan Sir",
+          "summary": "Anchor tags <a>, href attributes, relative vs absolute paths, target='_blank' security (rel='noopener noreferrer'), and mailto/tel links.",
+          "searchQuery": "HTML links anchor tags absolute relative path"
+        },
+        {
+          "id": "web-14",
+          "title": "Introduction to HTML5 Modern Standards",
+          "youtubeId": "UB1O30fR-EE",
+          "topic": "Introduction to HTML5",
+          "duration": "31:40",
+          "facultyName": "Sujan Sir",
+          "summary": "HTML5 multimedia (<video controls>, <audio>), SVG vector graphics, Canvas API, and web storage overview.",
+          "searchQuery": "HTML5 new features video audio canvas tutorial"
+        },
+        {
+          "id": "web-15",
+          "title": "HTML Semantic Elements for Clean SEO & Accessibility",
+          "youtubeId": "kGW8Al_cga4",
+          "topic": "HTML Semantic Elements",
+          "duration": "35:10",
+          "facultyName": "Sujan Sir",
+          "summary": "Replacing non-semantic <div> tags with <header>, <nav>, <main>, <section>, <article>, <aside>, and <footer>.",
+          "searchQuery": "HTML semantic tags elements header nav main article footer"
+        },
+        {
+          "id": "web-16",
+          "title": "More CSS Concepts: Cascading, Specificity & Inheritance",
+          "youtubeId": "wRNinF7YQqQ",
+          "topic": "More CSS Concepts",
+          "duration": "32:00",
+          "facultyName": "Sujan Sir",
+          "summary": "How browsers resolve style conflicts: source order, specificity calculations (Inline > ID > Class > Element), and inherited properties.",
+          "searchQuery": "CSS cascading inheritance specificity explained"
+        },
+        {
+          "id": "web-17",
+          "title": "CSS Selectors & Specificity Deep Dive",
+          "youtubeId": "c0kfZ8Q_c3o",
+          "topic": "CSS Selectors & Specificity",
+          "duration": "27:50",
+          "facultyName": "Sujan Sir",
+          "summary": "Combinator selectors (space, >, +, ~), attribute selectors ([type='text']), and pseudo-classes (:hover, :focus, :nth-child).",
+          "searchQuery": "CSS selectors combinators pseudo classes tutorial"
+        },
+        {
+          "id": "web-18",
+          "title": "Sizing Elements and CSS Units (rem, em, vh, vw, %)",
+          "youtubeId": "u044iM9xsWU",
+          "topic": "Sizing Elements and Box Sizing",
+          "duration": "30:30",
+          "facultyName": "Sujan Sir",
+          "summary": "Why px units break accessibility. Setting scalable root font sizes with rem, fluid cards with %, and full-screen hero sections with vh/vw.",
+          "searchQuery": "CSS units rem em vh vw percent Kevin Powell"
+        },
+        {
+          "id": "web-19",
+          "title": "Introduction to CSS Flexbox - Complete 1D Layout Guide",
+          "youtubeId": "fYq5PXgSsbE",
+          "topic": "Introduction to CSS Flexbox",
+          "duration": "42:15",
+          "facultyName": "Sujan Sir",
+          "summary": "Flex container vs flex items, main axis vs cross axis, justify-content, align-items, flex-direction, and flex-wrap.",
+          "searchQuery": "CSS Flexbox complete tutorial Traversy Media"
+        },
+        {
+          "id": "web-20",
+          "title": "CSS Flexbox & Responsive Media Queries",
+          "youtubeId": "yU7jJ3NbPdA",
+          "topic": "CSS Flexbox & Media Queries",
+          "duration": "36:40",
+          "facultyName": "Sujan Sir",
+          "summary": "Mobile-first responsive design, media query syntax (@media (min-width: 768px)), and responsive navigation bars.",
+          "searchQuery": "Responsive navigation bar with CSS Flexbox and media queries"
+        },
+        {
+          "id": "web-21",
+          "title": "Flexbox Sizing (flex-grow, flex-shrink, flex-basis)",
+          "youtubeId": "JJSoEo8JSnc",
+          "topic": "Flexbox Sizing & Building Web Applications",
+          "duration": "34:20",
+          "facultyName": "Sujan Sir",
+          "summary": "Mastering the flex shorthand (flex: 1 1 auto), preventing item squishing, and building flexible application cards.",
+          "searchQuery": "Flex grow flex shrink flex basis explained"
+        },
+        {
+          "id": "web-22",
+          "title": "Building Real-World Web Applications II",
+          "youtubeId": "G3e-cpL7ofc",
+          "topic": "Building Web Applications II",
+          "duration": "44:00",
+          "facultyName": "Sujan Sir",
+          "summary": "Assembling a complete multi-section SaaS landing page with responsive hero, feature grid, testimonial carousel, and footer.",
+          "searchQuery": "Build a responsive website from scratch HTML CSS project"
+        },
+        {
+          "id": "web-23",
+          "title": "CSS Grid I - Two-Dimensional Grid Systems",
+          "youtubeId": "jV8B24rSN5o",
+          "topic": "CSS Grid I",
+          "duration": "38:50",
+          "facultyName": "Sujan Sir",
+          "summary": "display: grid, grid-template-columns, fr units, repeat(), gap, and placing elements across grid lines.",
+          "searchQuery": "CSS Grid tutorial crash course Traversy Media"
+        },
+        {
+          "id": "web-24",
+          "title": "CSS Grid II - Template Areas, Auto-Fit & Auto-Fill",
+          "youtubeId": "rg7Fvvl3taU",
+          "topic": "CSS Grid II",
+          "duration": "35:15",
+          "facultyName": "Sujan Sir",
+          "summary": "grid-template-areas for dashboard layouts, minmax() function, and auto-fit / auto-fill responsive card grids with 0 media queries.",
+          "searchQuery": "CSS Grid auto fit auto fill minmax tutorial"
+        },
+        {
+          "id": "web-25",
+          "title": "CSS Positioning (Static, Relative, Absolute, Fixed, Sticky)",
+          "youtubeId": "jx5jmI0UlXU",
+          "topic": "CSS Positioning",
+          "duration": "31:45",
+          "facultyName": "Sujan Sir",
+          "summary": "Positioning contexts, top/right/bottom/left offsets, z-index stacking layers, fixed headers, and sticky table headers.",
+          "searchQuery": "CSS position absolute relative fixed sticky tutorial"
+        },
+        {
+          "id": "web-26",
+          "title": "Introduction to Tailwind CSS & Utility-First Architecture",
+          "youtubeId": "mr15Xzb1Few",
+          "topic": "Introduction to Tailwind CSS",
+          "duration": "40:10",
+          "facultyName": "Sujan Sir",
+          "summary": "Utility-first design paradigm, responsive prefixes (sm:, md:, lg:), flex and grid utilities, and configuring tailwind.config.",
+          "searchQuery": "Tailwind CSS crash course for beginners Traversy Media"
+        },
+        {
+          "id": "web-27",
+          "title": "Building Production-Ready Responsive Websites",
+          "youtubeId": "x_EEwG-71wY",
+          "topic": "Building Responsive Websites",
+          "duration": "48:30",
+          "facultyName": "Sujan Sir",
+          "summary": "Capstone project: building a clean, modern, fully-responsive tech dashboard from scratch with semantic HTML, CSS, and Tailwind.",
+          "searchQuery": "Build a responsive modern website HTML CSS Tailwind tutorial"
+        }
+      ]
+    },
+    {
+      "id": "genai",
+      "name": "Introduction to Generative AI",
+      "teacherName": "Kavya Mam",
+      "teacherRole": "AI & Autonomous Agents Faculty",
+      "teacherImage": "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&q=80&w=600",
+      "description": "Explore Generative AI models, prompt engineering, RAG pipelines, n8n workflow automations, image/audio generation, and autonomous agents.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "XrExE9yKIg1WjnnlVkGX",
+        "voiceName": "Kavya Mam (Matilda Cleared)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/teacher_agent_voice.mp3"
+      },
+      "sections": [
+        "Your Learning Journey",
+        "Generative AI Foundations",
+        "Exploring Gen AI Capabilities",
+        "Productivity Power Up with AI Tools",
+        "Prompt Engineering Fundamentals",
+        "Building Social Media Content Automation Workflow – Part 1",
+        "Building Social Media Content Automation Workflow – Part 2",
+        "Setting Up Google OAuth 2.0 for n8n",
+        "Advanced Prompt Engineering",
+        "Build Your Own AI News Summarizer – Part 1",
+        "Build Your Own AI News Summarizer – Part 2",
+        "Build Your Own AI News Summarizer – Part 3",
+        "Productivity Power-Up with AI Tools – Part 2",
+        "No-Code AI Automation",
+        "AI Workflows for Enhanced Productivity",
+        "Mastering Image Generation",
+        "Mastering Audio Generation & No-Code Application Building",
+        "Building AI Agents",
+        "Building an AI Shopping Assistant",
+        "Agents with Memory & Introduction to MCP",
+        "Slides"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "ai-1",
+          "title": "Your Gen AI Learning Journey & Roadmap",
+          "youtubeId": "G2fqAlgmoPo",
+          "topic": "Your Learning Journey",
+          "duration": "24:30",
+          "facultyName": "Kavya Mam",
+          "summary": "Orientation into the Gen AI revolution: foundational concepts, skills breakdown, and how to build a portfolio of AI-powered applications.",
+          "searchQuery": "Generative AI learning roadmap for beginners"
+        },
+        {
+          "id": "ai-2",
+          "title": "Generative AI Foundations & LLM Architecture",
+          "youtubeId": "aircAruvnKk",
+          "topic": "Generative AI Foundations",
+          "duration": "35:10",
+          "facultyName": "Kavya Mam",
+          "summary": "Transformers, self-attention mechanisms, next-token prediction, pre-training vs fine-tuning, and parameter scales.",
+          "searchQuery": "Generative AI foundations and LLM architecture explained"
+        },
+        {
+          "id": "ai-3",
+          "title": "Exploring Gen AI Capabilities (Text, Code, Vision, Audio)",
+          "youtubeId": "2eWuYf-KeOI",
+          "topic": "Exploring Gen AI Capabilities",
+          "duration": "28:45",
+          "facultyName": "Kavya Mam",
+          "summary": "Multimodal capabilities of state-of-the-art models across vision, structured data, and audio.",
+          "searchQuery": "Multimodal AI capabilities text vision audio code"
+        },
+        {
+          "id": "ai-4",
+          "title": "Productivity Power Up with AI Tools (Cursor, v0, Perplexity)",
+          "youtubeId": "jC4v5AS4RIM",
+          "topic": "Productivity Power Up with AI Tools",
+          "duration": "30:20",
+          "facultyName": "Kavya Mam",
+          "summary": "Supercharging software engineering workflows with AI-first IDEs, automated research engines, and UI code synthesizers.",
+          "searchQuery": "AI developer productivity tools Cursor v0 Perplexity"
+        },
+        {
+          "id": "ai-5",
+          "title": "Prompt Engineering Fundamentals & Best Practices",
+          "youtubeId": "_ZvnD93Mr5Q",
+          "topic": "Prompt Engineering Fundamentals",
+          "duration": "37:50",
+          "facultyName": "Kavya Mam",
+          "summary": "Persona framing, context injection, zero-shot prompting, few-shot demonstration pairs, and formatting constraints.",
+          "searchQuery": "Prompt engineering fundamentals course tutorial"
+        },
+        {
+          "id": "ai-6",
+          "title": "Building Social Media Content Automation Workflow – Part 1",
+          "youtubeId": "o8pUy1qS4d4",
+          "topic": "Building Social Media Content Automation Workflow – Part 1",
+          "duration": "32:15",
+          "facultyName": "Kavya Mam",
+          "summary": "Architecting automated pipelines that ingest raw blog articles or ideas, synthesize LinkedIn/Twitter posts, and structure metadata.",
+          "searchQuery": "Automate social media content with AI workflow tutorial"
+        },
+        {
+          "id": "ai-7",
+          "title": "Building Social Media Content Automation Workflow – Part 2",
+          "youtubeId": "c_lW2j3t7Hk",
+          "topic": "Building Social Media Content Automation Workflow – Part 2",
+          "duration": "34:40",
+          "facultyName": "Kavya Mam",
+          "summary": "Connecting webhooks, setting up AI approval gates, automating image generation banners, and publishing schedules.",
+          "searchQuery": "Automating content workflow using AI and webhooks part 2"
+        },
+        {
+          "id": "ai-8",
+          "title": "Setting Up Google OAuth 2.0 for n8n Automation",
+          "youtubeId": "W7tN3bW8l80",
+          "topic": "Setting Up Google OAuth 2.0 for n8n",
+          "duration": "22:10",
+          "facultyName": "Kavya Mam",
+          "summary": "Configuring Google Cloud Console credentials, OAuth Consent screens, client secrets, and authorized redirect URIs in n8n.",
+          "searchQuery": "Setting up Google OAuth 2.0 for n8n step by step"
+        },
+        {
+          "id": "ai-9",
+          "title": "Advanced Prompt Engineering (Chain-of-Thought & JSON)",
+          "youtubeId": "bBiTR_1sEmI",
+          "topic": "Advanced Prompt Engineering",
+          "duration": "36:00",
+          "facultyName": "Kavya Mam",
+          "summary": "Chain-of-Thought (CoT), Tree of Thoughts, Least-to-Most prompting, and enforcing strict JSON output schemas for APIs.",
+          "searchQuery": "Advanced prompt engineering chain of thought structured output"
+        },
+        {
+          "id": "ai-10",
+          "title": "Build Your Own AI News Summarizer – Part 1 (Ingestion)",
+          "youtubeId": "kCc8FmEb1nY",
+          "topic": "Build Your Own AI News Summarizer – Part 1",
+          "duration": "29:30",
+          "facultyName": "Kavya Mam",
+          "summary": "Fetching RSS feeds and web articles, parsing HTML DOM trees, stripping boilerplate, and handling rate limits.",
+          "searchQuery": "Build an AI news summarizer python web scraping"
+        },
+        {
+          "id": "ai-11",
+          "title": "Build Your Own AI News Summarizer – Part 2 (Vector Search)",
+          "youtubeId": "ySus5ZS0b94",
+          "topic": "Build Your Own AI News Summarizer – Part 2",
+          "duration": "31:45",
+          "facultyName": "Kavya Mam",
+          "summary": "Chunking article content, generating embeddings, cosine similarity deduplication, and LLM bullet-point synthesis.",
+          "searchQuery": "Vector search embeddings RAG news summarizer tutorial"
+        },
+        {
+          "id": "ai-12",
+          "title": "Build Your Own AI News Summarizer – Part 3 (Delivery)",
+          "youtubeId": "E2shqsY08-Y",
+          "topic": "Build Your Own AI News Summarizer – Part 3",
+          "duration": "26:50",
+          "facultyName": "Kavya Mam",
+          "summary": "Formatting daily digests into Slack / Discord webhooks, email notifications via SendGrid, and automated hosting.",
+          "searchQuery": "Automate AI news digest newsletter webhook delivery"
+        },
+        {
+          "id": "ai-13",
+          "title": "Productivity Power-Up with AI Tools – Part 2 (Advanced)",
+          "youtubeId": "f1F1s0Y876o",
+          "topic": "Productivity Power-Up with AI Tools – Part 2",
+          "duration": "28:15",
+          "facultyName": "Kavya Mam",
+          "summary": "Integrating terminal agents, automated Git commit message synthesis, and automated code review workflows.",
+          "searchQuery": "Advanced AI developer tools terminal agents git workflow"
+        },
+        {
+          "id": "ai-14",
+          "title": "No-Code AI Automation with Make & Zapier",
+          "youtubeId": "Uo38HkGfV8M",
+          "topic": "No-Code AI Automation",
+          "duration": "33:20",
+          "facultyName": "Kavya Mam",
+          "summary": "Building visual logic flows, connecting OpenAI API modules, conditional routers, error catchers, and data transformers.",
+          "searchQuery": "No-code AI automation tutorial Make Zapier OpenAI"
+        },
+        {
+          "id": "ai-15",
+          "title": "AI Workflows for Enhanced Enterprise Productivity (n8n)",
+          "youtubeId": "V_xro1497F8",
+          "topic": "AI Workflows for Enhanced Productivity",
+          "duration": "35:40",
+          "facultyName": "Kavya Mam",
+          "summary": "Deploying self-hosted n8n instances, scheduling cron automations, managing API secrets, and webhook data queues.",
+          "searchQuery": "n8n AI agent workflows complete beginner tutorial"
+        },
+        {
+          "id": "ai-16",
+          "title": "Mastering Image Generation (Midjourney & Stable Diffusion)",
+          "youtubeId": "qY4LzN3fM9w",
+          "topic": "Mastering Image Generation",
+          "duration": "37:10",
+          "facultyName": "Kavya Mam",
+          "summary": "Diffusion model physics, prompt modifiers (aspect ratios, stylize, lighting), negative prompts, and ControlNet guidance.",
+          "searchQuery": "Midjourney and Stable Diffusion prompt guide image generation"
+        },
+        {
+          "id": "ai-17",
+          "title": "Mastering Audio Generation & Cloned Voice Systems",
+          "youtubeId": "bO1Xw51eP0M",
+          "topic": "Mastering Audio Generation & No-Code Application Building",
+          "duration": "31:25",
+          "facultyName": "Kavya Mam",
+          "summary": "ElevenLabs voice cloning pipelines, text-to-speech API integration, WebRTC live conversational voice, and audio mastering.",
+          "searchQuery": "ElevenLabs AI voice cloning and conversational agent tutorial"
+        },
+        {
+          "id": "ai-18",
+          "title": "Building Autonomous AI Agents from Scratch",
+          "youtubeId": "b_v4MvB6yY0",
+          "topic": "Building AI Agents",
+          "duration": "42:00",
+          "facultyName": "Kavya Mam",
+          "summary": "The Anatomy of an AI Agent: ReAct reasoning loop (Reason + Act), tool declarations, scratchpad buffers, and goal convergence.",
+          "searchQuery": "How to build AI agents from scratch complete course"
+        },
+        {
+          "id": "ai-19",
+          "title": "Building an AI Shopping Assistant with Function Calling",
+          "youtubeId": "dffC40P5n8M",
+          "topic": "Building an AI Shopping Assistant",
+          "duration": "38:40",
+          "facultyName": "Kavya Mam",
+          "summary": "Enabling the LLM to search product databases, filter by price and availability, compare reviews, and execute cart checkout.",
+          "searchQuery": "Building AI assistant with function calling tools tutorial"
+        },
+        {
+          "id": "ai-20",
+          "title": "Agents with Memory & Introduction to MCP (Model Context Protocol)",
+          "youtubeId": "G7_bZc4G0lU",
+          "topic": "Agents with Memory & Introduction to MCP",
+          "duration": "39:15",
+          "facultyName": "Kavya Mam",
+          "summary": "Short-term vs long-term vector memory, entity buffers, and integrating Anthropic's Model Context Protocol (MCP) servers.",
+          "searchQuery": "Model Context Protocol MCP AI agents memory explained"
+        },
+        {
+          "id": "ai-21",
+          "title": "AI Presentations & Automated Slide Synthesis",
+          "youtubeId": "P_zB2H4v5jQ",
+          "topic": "Slides",
+          "duration": "21:30",
+          "facultyName": "Kavya Mam",
+          "summary": "Using Gamma and AI outline generators to convert documentation and project specs into professional executive slide decks.",
+          "searchQuery": "How to create presentations and pitch decks using AI"
+        }
+      ]
+    },
+    {
+      "id": "aptitude",
+      "name": "Quantitative Aptitude",
+      "teacherName": "Kusuma Mam",
+      "teacherRole": "Quantitative & Placement Aptitude Lead",
+      "teacherImage": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=600",
+      "description": "Crack campus placements and competitive exams with speed math shortcuts, LCM techniques, percentages, profit & loss, and time & work tricks.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "EXAVITQu4vr4xnSDxMaL",
+        "voiceName": "Kusuma Mam (Sarah Cleared)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/teacher_agent_voice.mp3"
+      },
+      "sections": [
+        "Introduction",
+        "Numbers",
+        "Power Cycles",
+        "Remainder Cycles",
+        "Company Specific Session – Numbers",
+        "Basics and Properties",
+        "Multiples",
+        "Factors",
+        "Company Specific Session – LCM & HCF",
+        "Percentages Basics",
+        "Percentages 1",
+        "Percentages 2",
+        "Profit & Loss",
+        "Simple Interest (SI) and Compound Interest (CI)",
+        "Ratios and Proportions",
+        "Mixtures and Alligations",
+        "Partnerships",
+        "Age Aptitude"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "apt-1",
+          "title": "Introduction to Quantitative Aptitude for Tech Placements",
+          "youtubeId": "vA8Tj0l5W7o",
+          "topic": "Introduction",
+          "duration": "25:10",
+          "facultyName": "Kusuma Mam",
+          "summary": "Exam patterns for TCS, Infosys, Cognizant, Wipro, and Accenture. Strategic time management and avoiding negative marking.",
+          "searchQuery": "Quantitative aptitude for campus placements syllabus introduction"
+        },
+        {
+          "id": "apt-2",
+          "title": "Numbers System: Classification, Face & Place Value",
+          "youtubeId": "HkSgVn7yWGE",
+          "topic": "Numbers",
+          "duration": "32:40",
+          "facultyName": "Kusuma Mam",
+          "summary": "Natural numbers, whole numbers, prime vs composite, coprime properties, and finding units digits of large sums.",
+          "searchQuery": "Number system aptitude tricks classification unit digit"
+        },
+        {
+          "id": "apt-3",
+          "title": "Power Cycles & Cyclicity of Unit Digits",
+          "youtubeId": "J8J9h4V4N40",
+          "topic": "Power Cycles",
+          "duration": "28:15",
+          "facultyName": "Kusuma Mam",
+          "summary": "Finding the last digit of expressions like 7^243 or 3^1000 in under 15 seconds using 4-step cyclicity patterns.",
+          "searchQuery": "Unit digit power cyclicity aptitude shortcut tricks"
+        },
+        {
+          "id": "apt-4",
+          "title": "Remainder Cycles & Remainder Theorems",
+          "youtubeId": "d6iQgtT3hHk",
+          "topic": "Remainder Cycles",
+          "duration": "31:20",
+          "facultyName": "Kusuma Mam",
+          "summary": "Euler's Totient function, Wilson's theorem, Fermat's Little Theorem, and solving polynomial modular remainders.",
+          "searchQuery": "Remainder theorem aptitude questions shortcuts"
+        },
+        {
+          "id": "apt-5",
+          "title": "Company Specific Session – Numbers (TCS, Infosys, Wipro)",
+          "youtubeId": "e9V-p2l3Z1E",
+          "topic": "Company Specific Session – Numbers",
+          "duration": "36:50",
+          "facultyName": "Kusuma Mam",
+          "summary": "Solving previous year actual company interview and online exam questions on Number Systems with shortcut tricks.",
+          "searchQuery": "TCS NQT Infosys number system previous year questions"
+        },
+        {
+          "id": "apt-6",
+          "title": "Basics and Properties: Divisibility Rules (2 to 19)",
+          "youtubeId": "M0_1M_p5W6w",
+          "topic": "Basics and Properties",
+          "duration": "27:30",
+          "facultyName": "Kusuma Mam",
+          "summary": "Lightning-fast divisibility checks for 7, 11, 13, 17, and 19. Eliminating multiple-choice options without long division.",
+          "searchQuery": "Divisibility rules 7 11 13 17 19 shortcut tricks aptitude"
+        },
+        {
+          "id": "apt-7",
+          "title": "Multiples & Finding Common Multiples (LCM)",
+          "youtubeId": "k0kfZ8Q_c3o",
+          "topic": "Multiples",
+          "duration": "26:40",
+          "facultyName": "Kusuma Mam",
+          "summary": "Understanding multiples, prime factorization method, and division method for finding the Least Common Multiple (LCM).",
+          "searchQuery": "LCM shortcut tricks aptitude problems"
+        },
+        {
+          "id": "apt-8",
+          "title": "Factors: Total Factors, Sum of Factors & Prime Factors",
+          "youtubeId": "V5dO7m0p8fE",
+          "topic": "Factors",
+          "duration": "33:10",
+          "facultyName": "Kusuma Mam",
+          "summary": "Formula to find the total number of even/odd factors, sum of all factors, and number of coprime factor pairs.",
+          "searchQuery": "Number of factors sum of factors prime factors shortcut tricks"
+        },
+        {
+          "id": "apt-9",
+          "title": "Company Specific Session – LCM & HCF Exam Questions",
+          "youtubeId": "t2oO5wK3Z3s",
+          "topic": "Company Specific Session – LCM & HCF",
+          "duration": "35:15",
+          "facultyName": "Kusuma Mam",
+          "summary": "Bells tolling together problems, circular track lap collisions, and largest tile tiling problems solved using LCM/HCF.",
+          "searchQuery": "HCF and LCM word problems bells tolling together aptitude"
+        },
+        {
+          "id": "apt-10",
+          "title": "Percentages Basics & Fraction Conversion Table",
+          "youtubeId": "rw4XbF2v6v8",
+          "topic": "Percentages Basics",
+          "duration": "30:45",
+          "facultyName": "Kusuma Mam",
+          "summary": "Mastering the fraction-to-percentage table (1/2 to 1/20), mental math multiplications, and base value identification.",
+          "searchQuery": "Percentage basics fraction to percentage conversion table shortcut"
+        },
+        {
+          "id": "apt-11",
+          "title": "Percentages 1: Successive Percentage Change Formula",
+          "youtubeId": "w4O5Wp6L3n0",
+          "topic": "Percentages 1",
+          "duration": "29:20",
+          "facultyName": "Kusuma Mam",
+          "summary": "Applying the universal formula (a + b + ab/100) to price inflation, salary increments, and area changes of 2D shapes.",
+          "searchQuery": "Successive percentage change formula problems aptitude"
+        },
+        {
+          "id": "apt-12",
+          "title": "Percentages 2: Population, Elections & Marks Distribution",
+          "youtubeId": "K9n5y_q6V3s",
+          "topic": "Percentages 2",
+          "duration": "31:40",
+          "facultyName": "Kusuma Mam",
+          "summary": "Solving compound population growth, election voting majorities, and student pass/fail boundary marks problems.",
+          "searchQuery": "Percentage word problems population election passing marks aptitude"
+        },
+        {
+          "id": "apt-13",
+          "title": "Profit & Loss, Marked Price & Discount Calculations",
+          "youtubeId": "uK3qM1p7V9E",
+          "topic": "Profit & Loss",
+          "duration": "38:15",
+          "facultyName": "Kusuma Mam",
+          "summary": "CP, SP, MP relationships, successive discounts, false weight shopkeeper tricks, and calculating net profit percentage.",
+          "searchQuery": "Profit and loss shortcut tricks aptitude Dear Sir"
+        },
+        {
+          "id": "apt-14",
+          "title": "Simple Interest (SI) & Compound Interest (CI) Tricks",
+          "youtubeId": "N7b5W2q0v1M",
+          "topic": "Simple Interest (SI) and Compound Interest (CI)",
+          "duration": "39:50",
+          "facultyName": "Kusuma Mam",
+          "summary": "Annual, semi-annual compounding, tree method for CI, and shortcut formulas for difference between CI and SI for 2 and 3 years.",
+          "searchQuery": "Simple interest and compound interest tricks aptitude"
+        },
+        {
+          "id": "apt-15",
+          "title": "Ratios and Proportions Masterclass",
+          "youtubeId": "jphyd_8rO8I",
+          "topic": "Ratios and Proportions",
+          "duration": "32:30",
+          "facultyName": "Kusuma Mam",
+          "summary": "Compound ratios, finding A:B:C from A:B and B:C, fourth proportional, mean proportional, and coins/rupees distribution problems.",
+          "searchQuery": "Ratio and proportion shortcut tricks aptitude"
+        },
+        {
+          "id": "apt-16",
+          "title": "Mixtures and Alligations (The Cross Method)",
+          "youtubeId": "D8e5W2v3n8s",
+          "topic": "Mixtures and Alligations",
+          "duration": "34:10",
+          "facultyName": "Kusuma Mam",
+          "summary": "The famous Alligation cross method: finding mixing proportions of liquids, average costs, and repeated dilution formulas.",
+          "searchQuery": "Mixtures and alligations shortcut alligation rule aptitude"
+        },
+        {
+          "id": "apt-17",
+          "title": "Partnerships & Profit Sharing Equations",
+          "youtubeId": "P7v2W9n3k0M",
+          "topic": "Partnerships",
+          "duration": "27:50",
+          "facultyName": "Kusuma Mam",
+          "summary": "Calculating profit shares when partners invest different capital amounts for varying months. Active vs sleeping partners.",
+          "searchQuery": "Partnership problems in aptitude shortcut tricks"
+        },
+        {
+          "id": "apt-18",
+          "title": "Age Aptitude Problems Solved in 10 Seconds",
+          "youtubeId": "K1p9V5w3M2s",
+          "topic": "Age Aptitude",
+          "duration": "26:30",
+          "facultyName": "Kusuma Mam",
+          "summary": "Solving father-son age ratios and past/future age shifts using constant difference ratio balancing without writing quadratic equations.",
+          "searchQuery": "Problems on ages shortcut tricks aptitude 10 seconds"
+        }
+      ]
+    },
+    {
+      "id": "mathematics",
+      "name": "Mathematics for CSE",
+      "teacherName": "Narendra Sir",
+      "teacherRole": "Senior Discrete & Applied Mathematics Faculty",
+      "teacherImage": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=600",
+      "description": "Rigorous mathematical foundations for Computer Science: number systems, bitwise operations, integer representations, modular arithmetic, group theory, and eigenvalues.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "IKne3meq5aSn9XLyUdCD",
+        "voiceName": "Narendra Sir (Charlie Cleared)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/narender_sir_maths_voice.m4a"
+      },
+      "sections": [
+        "Number Systems: Decimal & Binary",
+        "Number Systems: Octal & Hexadecimal",
+        "Basic Arithmetic Operations",
+        "Bitwise Operators",
+        "Applications of Bitwise Operators",
+        "Representation of Signed & Unsigned Integers – I",
+        "Representation of Signed & Unsigned Integers – II",
+        "GCD & LCM",
+        "Modulo Arithmetic – I",
+        "Modulo Arithmetic – II",
+        "Foundations of Counting and Probability",
+        "Matrices and Series",
+        "Sets and Binary Operations",
+        "Self Learning",
+        "Math for CSE Course Exam"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "math-1",
+          "title": "Number Systems: Decimal & Binary Representations",
+          "youtubeId": "rsxT4FfRBaM",
+          "topic": "Number Systems: Decimal & Binary",
+          "duration": "31:40",
+          "facultyName": "Narendra Sir",
+          "summary": "Positional numeral systems, base-10 to base-2 conversion, successive division by 2, and fractional binary expansions.",
+          "searchQuery": "Decimal to binary conversion number system Gate Smashers"
+        },
+        {
+          "id": "math-2",
+          "title": "Number Systems: Octal & Hexadecimal Conversions",
+          "youtubeId": "4ae94LisMhY",
+          "topic": "Number Systems: Octal & Hexadecimal",
+          "duration": "28:15",
+          "facultyName": "Narendra Sir",
+          "summary": "Base-8 and Base-16 conversions, 3-bit grouping for octal, 4-bit nibble grouping for hexadecimal, and memory address mapping.",
+          "searchQuery": "Octal and hexadecimal number system conversion Gate Smashers"
+        },
+        {
+          "id": "math-3",
+          "title": "Basic Binary Arithmetic Operations (Add, Subtract, Multiply)",
+          "youtubeId": "C5ek5fms0qI",
+          "topic": "Basic Arithmetic Operations",
+          "duration": "29:30",
+          "facultyName": "Narendra Sir",
+          "summary": "Binary addition rules, carry bit propagation, binary subtraction with borrows, and long multiplication shift-and-add logic.",
+          "searchQuery": "Binary addition subtraction multiplication division arithmetic"
+        },
+        {
+          "id": "math-4",
+          "title": "Bitwise Operators in Computer Science (AND, OR, XOR, NOT, Shifts)",
+          "youtubeId": "jlQmeycePCo",
+          "topic": "Bitwise Operators",
+          "duration": "34:50",
+          "facultyName": "Narendra Sir",
+          "summary": "Low-level bit manipulations: truth tables of &, |, ^, ~, left shift (<< 1 is *2), and logical vs arithmetic right shifts (>>).",
+          "searchQuery": "Bitwise operators in C and Computer Science Gate Smashers"
+        },
+        {
+          "id": "math-5",
+          "title": "Applications of Bitwise Operators in Algorithms",
+          "youtubeId": "ZwU6Xp5F36k",
+          "topic": "Applications of Bitwise Operators",
+          "duration": "37:20",
+          "facultyName": "Narendra Sir",
+          "summary": "Testing if a number is power of 2 (n & (n-1) == 0), finding the single non-repeating number using XOR, and bitmask subset generation.",
+          "searchQuery": "Bit manipulation algorithms and tricks competitive programming"
+        },
+        {
+          "id": "math-6",
+          "title": "Representation of Signed & Unsigned Integers – I",
+          "youtubeId": "4qH4unVtJkE",
+          "topic": "Representation of Signed & Unsigned Integers – I",
+          "duration": "32:10",
+          "facultyName": "Narendra Sir",
+          "summary": "Unsigned ranges [0, 2^n - 1], Sign-Magnitude notation, 1's Complement representation, and the double-zero issue.",
+          "searchQuery": "Representation of signed numbers 1s complement sign magnitude"
+        },
+        {
+          "id": "math-7",
+          "title": "Representation of Signed & Unsigned Integers – II (2's Complement)",
+          "youtubeId": "l_b6B4m4l6s",
+          "topic": "Representation of Signed & Unsigned Integers – II",
+          "duration": "35:40",
+          "facultyName": "Narendra Sir",
+          "summary": "2's complement hardware implementation, range [-2^(n-1), 2^(n-1) - 1], sign extension, and arithmetic overflow detection.",
+          "searchQuery": "2s complement representation overflow underflow Gate Smashers"
+        },
+        {
+          "id": "math-8",
+          "title": "Greatest Common Divisor (GCD) & Euclidean Algorithm",
+          "youtubeId": "yHwnAEOwvz8",
+          "topic": "GCD & LCM",
+          "duration": "30:25",
+          "facultyName": "Narendra Sir",
+          "summary": "Euclidean algorithm proof (gcd(a, b) = gcd(b, a mod b)), Extended Euclidean Algorithm for Bézout coefficients, and LCM relationship.",
+          "searchQuery": "Euclidean algorithm for GCD and LCM proof discrete math"
+        },
+        {
+          "id": "math-9",
+          "title": "Modulo Arithmetic – I: Congruence & Arithmetic Properties",
+          "youtubeId": "b4b8coHgv6U",
+          "topic": "Modulo Arithmetic – I",
+          "duration": "33:15",
+          "facultyName": "Narendra Sir",
+          "summary": "Modular congruence relation (a ≡ b (mod m)), equivalence classes, and modular addition/multiplication invariance.",
+          "searchQuery": "Modular arithmetic congruence properties discrete mathematics"
+        },
+        {
+          "id": "math-10",
+          "title": "Modulo Arithmetic – II: Modular Inverses & Cryptography",
+          "youtubeId": "1M6Xg_p3Wl0",
+          "topic": "Modulo Arithmetic – II",
+          "duration": "38:40",
+          "facultyName": "Narendra Sir",
+          "summary": "Modular Multiplicative Inverse, Fermat's Little Theorem (a^(p-1) ≡ 1 mod p), Euler's Totient function, and RSA encryption basics.",
+          "searchQuery": "Modular multiplicative inverse Fermat little theorem cryptography"
+        },
+        {
+          "id": "math-11",
+          "title": "Foundations of Counting and Probability in Computing",
+          "youtubeId": "iW_LkYkWp6Q",
+          "topic": "Foundations of Counting and Probability",
+          "duration": "36:10",
+          "facultyName": "Narendra Sir",
+          "summary": "Permutations (nPr), Combinations (nCr), Pigeonhole Principle, Principle of Inclusion-Exclusion, and Bayes' Theorem.",
+          "searchQuery": "Combinatorics and probability for computer science discrete math"
+        },
+        {
+          "id": "math-12",
+          "title": "Matrices, Eigenvalues & Linear Transformations",
+          "youtubeId": "fNk_zzaMoSs",
+          "topic": "Matrices and Series",
+          "duration": "41:30",
+          "facultyName": "Narendra Sir",
+          "summary": "Matrix multiplication non-commutativity, determinants, characteristic polynomials, Eigenvalues & Eigenvectors, and Cayley-Hamilton theorem.",
+          "searchQuery": "Eigenvalues and eigenvectors linear algebra 3Blue1Brown"
+        },
+        {
+          "id": "math-13",
+          "title": "Sets and Binary Operations (Group Theory Axioms)",
+          "youtubeId": "tyDKR4FG3nw",
+          "topic": "Sets and Binary Operations",
+          "duration": "44:00",
+          "facultyName": "Narendra Sir",
+          "summary": "Algebraic structures: binary operations, testing closure, associativity, identity elements, inverse elements, and Abelian Groups.",
+          "searchQuery": "Binary operations and group theory discrete mathematics Gate Smashers"
+        },
+        {
+          "id": "math-14",
+          "title": "Self Learning: Advanced Topics & CS Problem Sets",
+          "youtubeId": "u0N02Z1c8aI",
+          "topic": "Self Learning",
+          "duration": "27:50",
+          "facultyName": "Narendra Sir",
+          "summary": "Guided independent research on Graph Theory, adjacency matrices, chromatic numbers, and asymptotic recurrence relations.",
+          "searchQuery": "Graph theory discrete mathematics computer science Gate Smashers"
+        },
+        {
+          "id": "math-15",
+          "title": "Math for CSE Course Exam Strategy & High-Scoring Solutions",
+          "youtubeId": "rQ3j9vL1aPo",
+          "topic": "Math for CSE Course Exam",
+          "duration": "46:15",
+          "facultyName": "Narendra Sir",
+          "summary": "Complete semester course exam review: solving 15 typical college university exam questions with full blackboard rigor.",
+          "searchQuery": "Discrete mathematics for computer science full course exam revision"
+        }
+      ]
+    },
+    {
+      "id": "english",
+      "name": "English",
+      "teacherName": "Ankhi Mam",
+      "teacherRole": "Business & Verbal Communications Lead",
+      "teacherImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600",
+      "description": "Develop fluent English communication, eliminate grammatical errors, master subject-verb concord, and excel in campus placement HR interviews.",
+      "voiceConfig": {
+        "provider": "elevenlabs",
+        "voiceId": "a1TnjruAs5jTzdrjL8Vd",
+        "voiceName": "Ankhi Mam (Official Voice)",
+        "agentId": "agent_2001m787qgn3fbnag9rvn4rvb72x",
+        "status": "active",
+        "audioSampleUrl": "/uploads/audio/teacher_agent_voice.mp3"
+      },
+      "sections": [
+        "Significance of Communication Skills",
+        "Knowledge vs Skill",
+        "About the Course",
+        "Noun: Number and Collection",
+        "Countable and Uncountable Nouns",
+        "Verb Forms",
+        "Possessive Noun: Apostrophe",
+        "Pronouns: People and Things",
+        "Possessive Pronouns",
+        "Adjectives: Identification and Application",
+        "Articles: A and An"
+      ],
+      "youtubeVideos": [
+        {
+          "id": "eng-1",
+          "title": "Significance of Communication Skills in the Tech Industry",
+          "youtubeId": "HAnw168huqA",
+          "topic": "Significance of Communication Skills",
+          "duration": "24:10",
+          "facultyName": "Ankhi Mam",
+          "summary": "Why technical prowess alone is insufficient without effective spoken articulation, collaborative listening, and executive presence.",
+          "searchQuery": "Communication skills in corporate tech industry interview guide"
+        },
+        {
+          "id": "eng-2",
+          "title": "Knowledge vs Skill: Transitioning from Theory to Spoken Fluency",
+          "youtubeId": "123kL2p0N0s",
+          "topic": "Knowledge vs Skill",
+          "duration": "21:40",
+          "facultyName": "Ankhi Mam",
+          "summary": "Overcoming fear of speaking in English, building automatic vocal reflex pathways, and breaking free from internal mother-tongue translation.",
+          "searchQuery": "How to stop translating in your head and speak English fluently"
+        },
+        {
+          "id": "eng-3",
+          "title": "About the Course: Structured Blueprint for Corporate Communication",
+          "youtubeId": "dffC40P5n8M",
+          "topic": "About the Course",
+          "duration": "18:50",
+          "facultyName": "Ankhi Mam",
+          "summary": "Overview of grammar pillars, accent neutralization, tone modulation, eliminating fillers, and professional email etiquette.",
+          "searchQuery": "Business English and corporate communication skills course"
+        },
+        {
+          "id": "eng-4",
+          "title": "Noun: Number and Collection (Singular vs Plural Concord)",
+          "youtubeId": "o5U7m1w2K8s",
+          "topic": "Noun: Number and Collection",
+          "duration": "27:15",
+          "facultyName": "Ankhi Mam",
+          "summary": "Singular, plural, irregular nouns, collective nouns (team, committee, audience), and ensuring matching singular/plural verbs.",
+          "searchQuery": "Nouns singular plural collective nouns subject verb agreement"
+        },
+        {
+          "id": "eng-5",
+          "title": "Countable and Uncountable Nouns (Much vs Many, Few vs Little)",
+          "youtubeId": "qO2m5p8X3wL",
+          "topic": "Countable and Uncountable Nouns",
+          "duration": "26:30",
+          "facultyName": "Ankhi Mam",
+          "summary": "Common errors with uncountable nouns (information, furniture, advice, equipment), and using quantifiers like much, many, few, little.",
+          "searchQuery": "Countable and uncountable nouns English grammar BBC"
+        },
+        {
+          "id": "eng-6",
+          "title": "Verb Forms Masterclass (V1, V2, V3, Auxiliary Verbs)",
+          "youtubeId": "rV9X2p4M1wK",
+          "topic": "Verb Forms",
+          "duration": "33:20",
+          "facultyName": "Ankhi Mam",
+          "summary": "Action verbs vs state verbs, regular vs irregular past participles, modal auxiliaries (can, could, should, would), and tense consistency.",
+          "searchQuery": "English verb forms V1 V2 V3 auxiliary verbs tenses"
+        },
+        {
+          "id": "eng-7",
+          "title": "Possessive Noun: Apostrophe Rules & Common Traps",
+          "youtubeId": "tO3m5p8W2nL",
+          "topic": "Possessive Noun: Apostrophe",
+          "duration": "22:45",
+          "facultyName": "Ankhi Mam",
+          "summary": "Correct placement of the apostrophe ('s vs s'), distinguishing its vs it's, and collective possessives.",
+          "searchQuery": "Apostrophe rules possessive nouns its vs it's English grammar"
+        },
+        {
+          "id": "eng-8",
+          "title": "Pronouns: People and Things (Subject, Object, Demonstrative)",
+          "youtubeId": "uP5v2W9n3k0",
+          "topic": "Pronouns: People and Things",
+          "duration": "28:10",
+          "facultyName": "Ankhi Mam",
+          "summary": "Subjective pronouns (I, he, she) vs objective pronouns (me, him, her), reflexive pronouns (myself, himself), and who vs whom.",
+          "searchQuery": "Pronouns in English grammar subject object possessive reflexive"
+        },
+        {
+          "id": "eng-9",
+          "title": "Possessive Pronouns vs Possessive Adjectives",
+          "youtubeId": "vQ7w3M2n1p0",
+          "topic": "Possessive Pronouns",
+          "duration": "20:50",
+          "facultyName": "Ankhi Mam",
+          "summary": "Using my vs mine, your vs yours, their vs theirs. Eliminating redundant structures in formal professional correspondence.",
+          "searchQuery": "Possessive pronouns vs possessive adjectives my mine your yours"
+        },
+        {
+          "id": "eng-10",
+          "title": "Adjectives: Identification and Application in Interviews",
+          "youtubeId": "wR9n2M5p3wL",
+          "topic": "Adjectives: Identification and Application",
+          "duration": "29:30",
+          "facultyName": "Ankhi Mam",
+          "summary": "Using vivid descriptive adjectives in self-introductions, positive vs comparative vs superlative degrees, and order of adjectives.",
+          "searchQuery": "Adjectives in English grammar degrees of comparison order of adjectives"
+        },
+        {
+          "id": "eng-11",
+          "title": "Articles: A, An & The (Vowel Sound Principles)",
+          "youtubeId": "xS1v3W9n2k0",
+          "topic": "Articles: A and An",
+          "duration": "25:40",
+          "facultyName": "Ankhi Mam",
+          "summary": "Why phonetic sounds dictate 'an hour' and 'a university', omitting zero articles before proper nouns, and definite article rules.",
+          "searchQuery": "Articles in English grammar a an the vowel sound rules"
+        }
+      ]
+    }
+  ]
+}
