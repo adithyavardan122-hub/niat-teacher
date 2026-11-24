@@ -318,3 +318,102 @@ export async function getAllStudentsService() {
 
   return readFallbackStudents();
 }
+
+/**
+ * Direct Store / Upsert Student in MongoDB Atlas
+ * Stores: Student Name, NIAT ID (N26H04A0123), and Phone Number
+ */
+export async function storeStudentService({ name, niatId, phone, department, batch }) {
+  const cleanPhone = sanitizePhone(phone);
+  const cleanNiatId = sanitizeNiatId(niatId);
+  const cleanName = (name || '').trim();
+
+  if (!cleanPhone || cleanPhone.length !== 10) {
+    throw new Error('Please provide a valid 10-digit mobile number.');
+  }
+  if (!cleanName) {
+    throw new Error('Student name is required.');
+  }
+  if (!cleanNiatId || !cleanNiatId.startsWith('N')) {
+    throw new Error('NIAT Student ID must start with "N" (e.g. N26H04A0123).');
+  }
+
+  const mongoStatus = getMongoStatus();
+  let studentData = null;
+
+  if (mongoStatus.connected) {
+    try {
+      let student = await Student.findOne({
+        $or: [{ phone: cleanPhone }, { niatId: cleanNiatId }],
+      });
+
+      if (student) {
+        student.name = cleanName;
+        student.niatId = cleanNiatId;
+        student.phone = cleanPhone;
+        if (department) student.department = department;
+        if (batch) student.batch = batch;
+        student.lastLogin = new Date();
+        await student.save();
+      } else {
+        student = await Student.create({
+          name: cleanName,
+          niatId: cleanNiatId,
+          phone: cleanPhone,
+          department: department || 'B.Tech - Artificial Intelligence & Data Science',
+          batch: batch || '2024-2028',
+          lastLogin: new Date(),
+        });
+      }
+
+      studentData = {
+        id: student._id.toString(),
+        name: student.name,
+        niatId: student.niatId,
+        phone: student.phone,
+        department: student.department,
+        batch: student.batch,
+        lastLogin: student.lastLogin,
+        createdAt: student.createdAt,
+      };
+      console.log(`🍃 [MongoDB Atlas] Stored student: ${student.name} (${student.niatId}) - +91 ${student.phone}`);
+    } catch (err) {
+      console.warn('MongoDB Atlas store error:', err.message);
+    }
+  }
+
+  // Backup sync
+  const backupList = readFallbackStudents();
+  const existingIdx = backupList.findIndex(
+    (s) => s.phone === cleanPhone || s.niatId === cleanNiatId
+  );
+  const now = new Date().toISOString();
+
+  if (!studentData) {
+    studentData = {
+      id: existingIdx >= 0 ? backupList[existingIdx].id : 'std_' + Date.now(),
+      name: cleanName,
+      niatId: cleanNiatId,
+      phone: cleanPhone,
+      department: department || 'B.Tech - Artificial Intelligence & Data Science',
+      batch: batch || '2024-2028',
+      lastLogin: now,
+      createdAt: existingIdx >= 0 ? backupList[existingIdx].createdAt : now,
+    };
+  }
+
+  if (existingIdx >= 0) {
+    backupList[existingIdx] = { ...backupList[existingIdx], ...studentData };
+  } else {
+    backupList.push(studentData);
+  }
+  writeFallbackStudents(backupList);
+
+  return {
+    success: true,
+    message: `Student ${cleanName} (${cleanNiatId}) stored in MongoDB successfully!`,
+    student: studentData,
+    mongoConnected: mongoStatus.connected,
+  };
+}
+

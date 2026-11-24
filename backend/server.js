@@ -11,6 +11,7 @@ import {
   verifyOtpService,
   lookupStudentService,
   getAllStudentsService,
+  storeStudentService,
 } from './authService.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -344,6 +345,18 @@ app.get('/api/auth/students', async (_req, res) => {
     res.json({ success: true, count: students.length, students });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/auth/store-student
+// Stores student name, NIAT ID, and phone number directly into MongoDB
+app.post('/api/auth/store-student', async (req, res) => {
+  try {
+    const { name, niatId, phone, department, batch } = req.body;
+    const result = await storeStudentService({ name, niatId, phone, department, batch });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 

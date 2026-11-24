@@ -23,7 +23,55 @@ import { elevenLabsAgent } from './elevenLabsAgent.js';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState('landing');
+  // Student Authentication state (persisted in localStorage)
+  const [currentStudent, setCurrentStudent] = useState(() => {
+    try {
+      const saved = localStorage.getItem('niat_student');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Default to 'login' gate if not authenticated, otherwise 'landing'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const saved = localStorage.getItem('niat_student');
+      return saved ? 'landing' : 'login';
+    } catch {
+      return 'login';
+    }
+  });
+
+  // Protected navigation handler: blocks unauthorized access to features
+  const navigateTab = (target) => {
+    if (!currentStudent && target !== 'login') {
+      setActiveTab('login');
+      return;
+    }
+    setActiveTab(target);
+  };
+
+  const handleLoginSuccess = (student) => {
+    setCurrentStudent(student);
+    try {
+      localStorage.setItem('niat_student', JSON.stringify(student));
+    } catch (e) {
+      console.warn('Could not save student to localStorage', e);
+    }
+    setActiveTab('subjects');
+  };
+
+  const handleLogout = () => {
+    setCurrentStudent(null);
+    try {
+      localStorage.removeItem('niat_student');
+    } catch (e) {
+      console.warn('Could not clear localStorage', e);
+    }
+    setActiveTab('login');
+  };
+
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSection, setSelectedSection] = useState('HTML');
@@ -42,6 +90,7 @@ export function App() {
   const [hasAudioAccess, setHasAudioAccess] = useState(false);
   const [isVoiceChatActive, setIsVoiceChatActive] = useState(false);
   const [syllabusSearch, setSyllabusSearch] = useState('');
+
 
   // Admin states
   const [adminSelectedSubject, setAdminSelectedSubject] = useState('programming');
@@ -68,37 +117,6 @@ export function App() {
   const [llmProvider, setLlmProvider] = useState(() => {
     return localStorage.getItem('niat_llm_provider') || 'pollinations';
   });
-
-  // Student Authentication state (persisted in localStorage)
-  const [currentStudent, setCurrentStudent] = useState(() => {
-    try {
-      const saved = localStorage.getItem('niat_student');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const handleLoginSuccess = (student) => {
-    setCurrentStudent(student);
-    try {
-      localStorage.setItem('niat_student', JSON.stringify(student));
-    } catch (e) {
-      console.warn('Could not save student to localStorage', e);
-    }
-    setActiveTab('subjects');
-  };
-
-  const handleLogout = () => {
-    setCurrentStudent(null);
-    try {
-      localStorage.removeItem('niat_student');
-    } catch (e) {
-      console.warn('Could not clear localStorage', e);
-    }
-    setActiveTab('landing');
-  };
-
 
   const populateAdminForm = (s) => {
     setAdminSelectedSubject(s.id);
@@ -572,63 +590,63 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col font-sans selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-6 py-3 flex items-center justify-between">
         <div
-          onClick={() => setActiveTab('landing')}
+          onClick={() => navigateTab('landing')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform">
             <GraduationCap className="w-6 h-6 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
-              <span className="gradient-text font-black">NIAT STUDENTS</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">AI TEACHER</span>
+              <span className="text-white font-black tracking-tight">NIAT ACADEMY</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/30">STUDENT PORTAL</span>
             </h1>
-            <p className="text-[11px] text-slate-400">Voice Doubt Clarification Platform</p>
+            <p className="text-[11px] text-slate-400">Autonomous Faculty Doubt Clarification Platform</p>
           </div>
         </div>
 
         {/* Navigation links */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
+        <nav className="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
           <button
-            onClick={() => setActiveTab('landing')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeTab === 'landing' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => navigateTab('landing')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'landing' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}
           >
             Home
           </button>
           <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeTab === 'dashboard' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => navigateTab('dashboard')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'dashboard' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}
           >
             Dashboard
           </button>
           <button
-            onClick={() => setActiveTab('subjects')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeTab === 'subjects' || activeTab === 'sections' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => navigateTab('subjects')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'subjects' || activeTab === 'sections' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}
           >
             Syllabus & Subjects
           </button>
           <button
-            onClick={() => setActiveTab('chat')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeTab === 'chat' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => navigateTab('chat')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'chat' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}
           >
             AI Chatroom
           </button>
           <button
             onClick={() => setActiveTab('login')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'login' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}
           >
-            <User className="w-3.5 h-3.5 text-purple-400" />
+            <User className="w-3.5 h-3.5 text-blue-400" />
             {currentStudent ? 'Student Account' : 'Student Login'}
           </button>
           <button
-            onClick={() => setActiveTab('admin')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'admin' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => navigateTab('admin')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'admin' ? 'bg-slate-800 text-blue-300 border border-blue-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'}`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
             Admin Portal
           </button>
         </nav>
@@ -636,38 +654,48 @@ export function App() {
         {/* User quick status & Start button */}
         <div className="flex items-center gap-3">
           {currentStudent ? (
-            <div
-              onClick={() => setActiveTab('login')}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-purple-500/30 hover:border-purple-400 cursor-pointer transition-all shadow-sm group"
-              title="Click to view student account or logout"
-            >
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white uppercase shadow">
-                {currentStudent.name ? currentStudent.name[0] : 'S'}
+            <div className="flex items-center gap-2">
+              <div
+                onClick={() => setActiveTab('login')}
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-blue-500 cursor-pointer transition-all shadow-sm group"
+                title="Click to view student account"
+              >
+                <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white uppercase shadow">
+                  {currentStudent.name ? currentStudent.name[0] : 'S'}
+                </div>
+                <div className="text-left hidden sm:block leading-tight">
+                  <p className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">
+                    {currentStudent.name}
+                  </p>
+                  <p className="text-[10px] font-mono text-blue-400">{currentStudent.niatId}</p>
+                </div>
               </div>
-              <div className="text-left hidden sm:block leading-tight">
-                <p className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">
-                  {currentStudent.name}
-                </p>
-                <p className="text-[10px] font-mono text-purple-400">{currentStudent.niatId}</p>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-xl bg-slate-800/80 hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-400 border border-slate-700 text-slate-400 transition-all cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
           ) : (
             <button
               onClick={() => setActiveTab('login')}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/40 text-purple-200 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
             >
-              <User className="w-3.5 h-3.5 text-purple-400" />
-              <span>Student Login (OTP)</span>
+              <Lock className="w-3.5 h-3.5" />
+              <span>Login to Portal</span>
             </button>
           )}
 
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Teacher Voice Engine Online</span>
+            <span>Faculty Voice Engine Online</span>
           </div>
+
           <button
-            onClick={() => setActiveTab('chat')}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-purple-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
+            onClick={() => navigateTab('chat')}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Mic className="w-4 h-4" />
             <span>Ask Doubts</span>
@@ -677,75 +705,99 @@ export function App() {
 
       {/* Main Body Switcher */}
       <main className="flex-1 flex flex-col">
-        {/* TAB 1: LANDING PAGE */}
-        {activeTab === 'landing' && (
-          <div className="flex-1 flex flex-col">
-            {/* Hero Section */}
-            <section className="relative overflow-hidden pt-16 pb-20 px-6">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.18),rgba(255,255,255,0))]"></div>
+        {/* MANDATORY GATEWAY: User must login first before accessing features */}
+        {!currentStudent ? (
+          <StudentLogin
+            apiBaseUrl={API_BASE_URL}
+            currentStudent={currentStudent}
+            onLoginSuccess={handleLoginSuccess}
+            onLogout={handleLogout}
+            onNavigateHome={() => setActiveTab('subjects')}
+            isMandatoryBarrier={true}
+          />
+        ) : (
+          <>
+            {/* TAB: STUDENT LOGIN / ACCOUNT PROFILE */}
+            {activeTab === 'login' && (
+              <StudentLogin
+                apiBaseUrl={API_BASE_URL}
+                currentStudent={currentStudent}
+                onLoginSuccess={handleLoginSuccess}
+                onLogout={handleLogout}
+                onNavigateHome={() => setActiveTab('subjects')}
+                isMandatoryBarrier={false}
+              />
+            )}
 
-              <div className="max-w-5xl mx-auto text-center relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-medium mb-6 animate-pulse">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span>Exclusively Designed for NIAT College Students</span>
-                </div>
+            {/* TAB 1: LANDING PAGE */}
+            {activeTab === 'landing' && (
+              <div className="flex-1 flex flex-col">
+                {/* Hero Section */}
+                <section className="relative overflow-hidden pt-16 pb-20 px-6">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,rgba(37,99,235,0.12),transparent)]"></div>
 
-                <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight sm:leading-none mb-6">
-                  Your Personal <span className="gradient-text">AI Teachers</span> <br className="hidden sm:inline" />
-                  Are Here!
-                </h1>
+                  <div className="max-w-5xl mx-auto text-center relative z-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-semibold mb-6">
+                      <Sparkles className="w-4 h-4 text-blue-400" />
+                      <span>Exclusively for NIAT Engineering Students</span>
+                    </div>
 
-                <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-                  Ask doubts. Talk to teachers. Learn without limits. Get step-by-step guidance in your teacher's actual voice, with screenshot error analysis and code debugging.
-                </p>
+                    <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight sm:leading-none mb-6 text-white">
+                      NIAT Faculty <span className="text-blue-400">Doubt Clarification</span> <br className="hidden sm:inline" /> Academic Platform
+                    </h1>
 
-                <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-                  <button
-                    onClick={() => setActiveTab('subjects')}
-                    className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold shadow-lg shadow-purple-500/30 transition-all flex items-center gap-2 text-sm cursor-pointer group"
-                  >
-                    <span>Start Learning</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                    <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                      Ask doubts directly to your course faculty, verify complex algorithms, debug code, and listen to step-by-step explanations in certified faculty voices.
+                    </p>
 
-                  <button
-                    onClick={() => setActiveTab('login')}
-                    className="px-6 py-3.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 text-purple-200 font-semibold border border-purple-500/40 transition-all flex items-center gap-2 text-sm cursor-pointer shadow-lg shadow-purple-900/20"
-                  >
-                    <IdCard className="w-4 h-4 text-purple-400" />
-                    <span>{currentStudent ? `Student: ${currentStudent.niatId}` : 'Student Login (Phone OTP)'}</span>
-                  </button>
+                    <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+                      <button
+                        onClick={() => navigateTab('subjects')}
+                        className="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-md shadow-blue-600/30 transition-all flex items-center gap-2 text-sm cursor-pointer group"
+                      >
+                        <span>Explore Syllabus & Faculty</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </button>
 
-                  <button
-                    onClick={() => {
-                      const math = subjects.find(s => s.id === 'mathematics') || subjects[2];
-                      if (math) {
-                        setSelectedSubject(math);
-                        setSelectedSection(math.sections[0] || 'Algebra');
-                        setActiveTab('chat');
-                      }
-                    }}
-                    className="px-6 py-3.5 rounded-xl glass-card hover:bg-slate-800/80 text-slate-200 font-medium border border-slate-700/80 transition-all flex items-center gap-2 text-sm cursor-pointer"
-                  >
-                    <Volume2 className="w-4 h-4 text-purple-400" />
-                    <span>Talk to Narendra Sir (Maths Voice)</span>
-                  </button>
+                      <button
+                        onClick={() => navigateTab('login')}
+                        className="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-100 font-semibold border border-slate-700 transition-all flex items-center gap-2 text-sm cursor-pointer shadow-sm"
+                      >
+                        <IdCard className="w-4 h-4 text-blue-400" />
+                        <span>Student ID: {currentStudent.niatId}</span>
+                      </button>
 
-                  <button
-                    onClick={() => {
-                      const prog = subjects.find(s => s.id === 'programming') || subjects[0];
-                      if (prog) {
-                        setSelectedSubject(prog);
-                        setSelectedSection('Python');
-                        setActiveTab('chat');
-                      }
-                    }}
-                    className="px-6 py-3.5 rounded-xl glass-card hover:bg-slate-800/80 text-slate-200 font-medium border border-slate-700/80 transition-all flex items-center gap-2 text-sm cursor-pointer"
-                  >
-                    <Volume2 className="w-4 h-4 text-emerald-400" />
-                    <span>Talk to Atifa Mam (Python Voice)</span>
-                  </button>
-                </div>
+                      <button
+                        onClick={() => {
+                          const math = subjects.find(s => s.id === 'mathematics') || subjects[2];
+                          if (math) {
+                            setSelectedSubject(math);
+                            setSelectedSection(math.sections[0] || 'Algebra');
+                            navigateTab('chat');
+                          }
+                        }}
+                        className="px-6 py-3.5 rounded-xl glass-card hover:bg-slate-800/80 text-slate-200 font-medium border border-slate-700/80 transition-all flex items-center gap-2 text-sm cursor-pointer"
+                      >
+                        <Volume2 className="w-4 h-4 text-blue-400" />
+                        <span>Talk to Narendra Sir (Maths Voice)</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const prog = subjects.find(s => s.id === 'programming') || subjects[0];
+                          if (prog) {
+                            setSelectedSubject(prog);
+                            setSelectedSection('Python');
+                            navigateTab('chat');
+                          }
+                        }}
+                        className="px-6 py-3.5 rounded-xl glass-card hover:bg-slate-800/80 text-slate-200 font-medium border border-slate-700/80 transition-all flex items-center gap-2 text-sm cursor-pointer"
+                      >
+                        <Volume2 className="w-4 h-4 text-emerald-400" />
+                        <span>Talk to Atifa Mam (Python Voice)</span>
+                      </button>
+                    </div>
+
 
                 {/* Featured Teacher Highlight Banner - 6 Core Faculties */}
                 <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1063,17 +1115,6 @@ export function App() {
               </div>
             </section>
           </div>
-        )}
-
-        {/* TAB: STUDENT LOGIN & OTP AUTHENTICATION */}
-        {activeTab === 'login' && (
-          <StudentLogin
-            apiBaseUrl={API_BASE_URL}
-            currentStudent={currentStudent}
-            onLoginSuccess={handleLoginSuccess}
-            onLogout={handleLogout}
-            onNavigateHome={() => setActiveTab('subjects')}
-          />
         )}
 
         {/* TAB 2: STUDENT DASHBOARD */}
@@ -2121,6 +2162,8 @@ export function App() {
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
         {/* JARVIS Holographic YouTube HUD Theatre */}
         <YouTubeHUDPlayer
