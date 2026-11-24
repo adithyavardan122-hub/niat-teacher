@@ -15,7 +15,7 @@ import {
 } from './icons.jsx';
 import {
   firebaseConfig,
-  setupRecaptcha,
+  createRecaptchaVerifier,
   sendFirebasePhoneOtp,
 } from './firebaseConfig.js';
 
@@ -42,6 +42,25 @@ export function StudentLogin({
 
   // Ref to prevent multiple OTP sends in rapid succession
   const otpSentRef = useRef(false);
+
+  // reCAPTCHA refs — matches the reference PhoneLogin pattern:
+  //   recaptchaRef   → the actual DOM <div> node (passed to RecaptchaVerifier)
+  //   verifierRef    → the RecaptchaVerifier instance (created once, reused on resend)
+  //   renderPromiseRef → the promise returned by verifier.render() (must be awaited
+  //                      before signInWithPhoneNumber is called)
+  const recaptchaRef    = useRef(null);
+  const verifierRef     = useRef(null);
+  const renderPromiseRef = useRef(null);
+
+  // Clean up the verifier when the component unmounts so the reCAPTCHA widget
+  // is properly destroyed and doesn't leak into the next mount.
+  useEffect(() => {
+    return () => {
+      verifierRef.current?.clear();
+      verifierRef.current     = null;
+      renderPromiseRef.current = null;
+    };
+  }, []);
 
   // Determine the API base URL robustly
   const API_URL = (
@@ -172,9 +191,19 @@ export function StudentLogin({
     try {
       const e164 = `+91${cleanPhone}`;
 
-      // Set up invisible reCAPTCHA and send OTP via Firebase
-      const appVerifier = setupRecaptcha('recaptcha-container');
-      const result = await sendFirebasePhoneOtp(e164, appVerifier);
+      // Build the verifier once; reuse it on resend (avoids double-render errors).
+      // recaptchaRef.current is the real DOM node — matches the reference pattern:
+      //   verifierRef.current = new RecaptchaVerifier(auth, recaptchaRef.current, { size: 'normal' })
+      //   renderPromiseRef.current = verifierRef.current.render()
+      if (!verifierRef.current) {
+        verifierRef.current    = createRecaptchaVerifier(recaptchaRef.current, 'invisible');
+        renderPromiseRef.current = verifierRef.current.render();
+      }
+
+      // Always await the render promise before signInWithPhoneNumber
+      await renderPromiseRef.current;
+
+      const result = await sendFirebasePhoneOtp(e164, verifierRef.current);
 
       setConfirmationResult(result);
       otpSentRef.current = true;
@@ -199,10 +228,11 @@ export function StudentLogin({
         setErrorMsg(err.message || 'Failed to send OTP. Please try again.');
       }
 
-      // Reset reCAPTCHA so the user can retry
-      if (window.recaptchaVerifier) {
-        try { window.recaptchaVerifier.clear(); } catch { /* ignore */ }
-        window.recaptchaVerifier = null;
+      // Reset reCAPTCHA so the user can retry with a fresh verifier
+      if (verifierRef.current) {
+        try { verifierRef.current.clear(); } catch { /* ignore */ }
+        verifierRef.current     = null;
+        renderPromiseRef.current = null;
       }
     } finally {
       setLoading(false);
@@ -328,7 +358,16 @@ export function StudentLogin({
     setStep('phone');
     setErrorMsg('');
     setSuccessMsg('');
-    // A tiny delay so the reCAPTCHA container re-mounts cleanly
+
+    // Clear the old verifier so a fresh one is created on the next send
+    if (verifierRef.current) {
+      try { verifierRef.current.clear(); } catch { /* ignore */ }
+      verifierRef.current     = null;
+      renderPromiseRef.current = null;
+    }
+
+    // Small delay so the reCAPTCHA container div is back in the DOM
+    // before RecaptchaVerifier tries to attach to it
     setTimeout(() => {
       handleSendOtp();
     }, 100);
@@ -439,8 +478,8 @@ export function StudentLogin({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#070b14] relative min-h-[calc(100vh-60px)]">
-      {/* Invisible reCAPTCHA container — Firebase requires this div to exist in the DOM */}
-      <div id="recaptcha-container"></div>
+      {/* reCAPTCHA container — Firebase attaches the widget to this real DOM node via recaptchaRef */}
+      <div ref={recaptchaRef} id="recaptcha-container"></div>
 
       <div className="w-full max-w-md glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-2xl relative z-10">
 
