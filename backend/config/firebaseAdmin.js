@@ -1,54 +1,65 @@
-import { initializeApp, getApps } from 'firebase-admin/app';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
-// Initialize Firebase Admin app safely
+/**
+ * Firebase Admin SDK initialization.
+ *
+ * Production (Render / cloud): Set FIREBASE_SERVICE_ACCOUNT_JSON env var to the
+ * full contents of your serviceAccountKey.json file (as a JSON string).
+ *
+ * Local development: Set FIREBASE_PROJECT_ID in backend/.env — the Admin SDK
+ * can verify tokens using just the project ID when running with Application
+ * Default Credentials or when you explicitly provide a service account.
+ *
+ * To generate a service account key:
+ *   Firebase Console → Project Settings → Service Accounts → Generate new private key
+ */
+
 let adminApp;
+
 try {
-  adminApp = !getApps().length
-    ? initializeApp({
-        projectId: process.env.FIREBASE_PROJECT_ID || 'niat-academy-portal',
-      })
-    : getApps()[0];
+  if (!getApps().length) {
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+    if (serviceAccountJson) {
+      // Production: full service account credentials provided as env var
+      const serviceAccount = JSON.parse(serviceAccountJson);
+      adminApp = initializeApp({ credential: cert(serviceAccount) });
+      console.log('[Firebase Admin] Initialized with service account credentials.');
+    } else {
+      // Development fallback: project-ID-only initialization.
+      // Token verification will work if the token was issued by the same project.
+      const projectId = process.env.FIREBASE_PROJECT_ID;
+      if (!projectId) {
+        throw new Error(
+          'FIREBASE_PROJECT_ID is not set in backend/.env. ' +
+          'Set it to your Firebase project ID (e.g. niatteachers).'
+        );
+      }
+      adminApp = initializeApp({ projectId });
+      console.log(`[Firebase Admin] Initialized with projectId: ${projectId}`);
+    }
+  } else {
+    adminApp = getApps()[0];
+  }
 } catch (err) {
-  console.warn('Firebase Admin initialization notice:', err.message);
+  console.error('[Firebase Admin] Initialization error:', err.message);
 }
 
-// Export firebaseAuth matching the user's verifyToken middleware specification
+/**
+ * firebaseAuth — wraps the Admin Auth instance.
+ * verifyIdToken() throws on any invalid or expired token; never returns fake data.
+ */
 export const firebaseAuth = {
   verifyIdToken: async (token) => {
-    // 1. If live Firebase Admin Auth is active, attempt direct token verification
-    try {
-      if (adminApp) {
-        const authInstance = getAuth(adminApp);
-        return await authInstance.verifyIdToken(token);
-      }
-    } catch (adminErr) {
-      console.info('Firebase token live verify notice:', adminErr.message);
+    if (!adminApp) {
+      throw new Error(
+        'Firebase Admin is not initialized. Check FIREBASE_PROJECT_ID or ' +
+        'FIREBASE_SERVICE_ACCOUNT_JSON in backend/.env'
+      );
     }
-
-    // 2. Decode custom token / development token safely
-    if (token) {
-      try {
-        const parts = token.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-          return {
-            uid: payload.user_id || payload.sub || payload.uid || 'firebase_user_id',
-            phone_number: payload.phone_number || '+919876543210',
-            ...payload,
-          };
-        }
-      } catch {
-        // Not a standard 3-part JWT
-      }
-
-      return {
-        uid: 'firebase_user_id',
-        phone_number: '+919876543210',
-      };
-    }
-
-    throw new Error('Invalid Firebase token');
+    // This call throws if the token is invalid, expired, or from the wrong project.
+    return await getAuth(adminApp).verifyIdToken(token);
   },
 };
 

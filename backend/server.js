@@ -5,14 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import 'dotenv/config';
-import { connectDB, getMongoStatus } from './db.js';
-import {
-  sendOtpService,
-  verifyOtpService,
-  lookupStudentService,
-  getAllStudentsService,
-  storeStudentService,
-} from './authService.js';
+import { connectDB } from './db.js';
 import authRoutes from './routes/authRoutes.js';
 
 
@@ -27,8 +20,10 @@ const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
   'http://localhost:3000',
   'http://localhost:5173',
+  'http://localhost:5174',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
 ].filter(Boolean);
 
 app.use(cors({
@@ -280,89 +275,10 @@ app.post('/api/admin/update-teacher', (req, res) => {
   res.json({ success: true, subject: db.subjects[idx] });
 });
 
-// ─── AUTHENTICATION & MONGODB ROUTES ────────────────────────────────────────
+// ─── AUTHENTICATION ROUTES ───────────────────────────────────────────────────
+// All /api/auth/* routes are handled by authRoutes.js (including /status,
+// /profile, /send-otp, /verify-otp, /lookup, /students, /store-student).
 app.use('/api/auth', authRoutes);
-
-
-// Check MongoDB and Auth Status
-app.get('/api/auth/status', (_req, res) => {
-  const status = getMongoStatus();
-  res.json({
-    success: true,
-    mongo: status,
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// POST /api/auth/send-otp
-// Request body: { phone, name, niatId }
-app.post('/api/auth/send-otp', async (req, res) => {
-  try {
-    const { phone, name, niatId } = req.body;
-    const result = await sendOtpService({ phone, name, niatId });
-    res.json({
-      success: true,
-      message: `OTP sent successfully to +91 ${result.phone}`,
-      phone: result.phone,
-      otp: result.otp, // Returned for instant testing and demonstration
-      expiresInSeconds: result.expiresInSeconds,
-      mongoConnected: result.mongoConnected,
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// POST /api/auth/verify-otp
-// Request body: { phone, otp, name, niatId }
-app.post('/api/auth/verify-otp', async (req, res) => {
-  try {
-    const { phone, otp, name, niatId } = req.body;
-    const result = await verifyOtpService({ phone, otp, name, niatId });
-    res.json({
-      success: true,
-      message: 'Student verified and logged in successfully!',
-      student: result.student,
-      mongoConnected: result.mongoConnected,
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// POST /api/auth/lookup
-// Request body: { phone, niatId }
-app.post('/api/auth/lookup', async (req, res) => {
-  try {
-    const { phone, niatId } = req.body;
-    const result = await lookupStudentService({ phone, niatId });
-    res.json({ success: true, ...result });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
-
-// GET /api/auth/students (List registered students)
-app.get('/api/auth/students', async (_req, res) => {
-  try {
-    const students = await getAllStudentsService();
-    res.json({ success: true, count: students.length, students });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// POST /api/auth/store-student
-// Stores student name, NIAT ID, and phone number directly into MongoDB
-app.post('/api/auth/store-student', async (req, res) => {
-  try {
-    const { name, niatId, phone, department, batch } = req.body;
-    const result = await storeStudentService({ name, niatId, phone, department, batch });
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
 
 // POST /api/admin/upload-audio  (multipart — handled via multer)
 const uploadDir = path.join(__dirname, 'public', 'uploads', 'teachers');

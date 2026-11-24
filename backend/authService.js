@@ -152,8 +152,9 @@ export async function verifyOtpService({ phone, otp, name, niatId }) {
     }
   }
 
-  // Developer convenience: Allow '123456' as universal test bypass OTP if requested
-  if (!isValidOtp && cleanOtp === '123456') {
+  // Developer convenience: Allow '123456' as universal test bypass OTP if explicitly enabled
+  if (!isValidOtp && cleanOtp === '123456' && process.env.NODE_ENV !== 'production') {
+    console.warn('[OTP] ⚠️  Universal test OTP bypass used (development only). Disable in production.');
     isValidOtp = true;
   }
 

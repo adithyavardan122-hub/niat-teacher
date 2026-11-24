@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Check,
   RefreshCw,
-  Sparkles,
   Database,
   IdCard,
   LogOut,
@@ -16,10 +15,8 @@ import {
 } from './icons.jsx';
 import {
   firebaseConfig,
-  FIREBASE_AUTH_TOKEN,
   setupRecaptcha,
   sendFirebasePhoneOtp,
-  authenticateWithFirebaseToken,
 } from './firebaseConfig.js';
 
 export function StudentLogin({
@@ -38,24 +35,30 @@ export function StudentLogin({
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [demoOtp, setDemoOtp] = useState(null);
   const [resendTimer, setResendTimer] = useState(0);
   const [mongoStatus, setMongoStatus] = useState({ connected: false, checked: false });
-  const [firebaseStatus, setFirebaseStatus] = useState({ connected: true, projectId: firebaseConfig.projectId });
   const [recentStudents, setRecentStudents] = useState([]);
-  const [confirmation, setConfirmation] = useState(null);
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [user, setUser] = useState(null);
-  const [message, setMessage] = useState('');
 
+  // Ref to prevent multiple OTP sends in rapid succession
+  const otpSentRef = useRef(false);
 
-  // Check MongoDB and Firebase connection status on mount
+  // Determine the API base URL robustly
+  const API_URL = (
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    apiBaseUrl ||
+    'http://localhost:5000'
+  ).replace(/\/+$/, '');
+
+  // ── Lifecycle ───────────────────────────────────────────────────────────────
+
   useEffect(() => {
     checkMongoStatus();
     loadRecentStudents();
   }, []);
 
-  // Timer countdown for resending OTP
+  // Resend OTP countdown
   useEffect(() => {
     if (resendTimer <= 0) return;
     const interval = setInterval(() => {
@@ -64,9 +67,11 @@ export function StudentLogin({
     return () => clearInterval(interval);
   }, [resendTimer]);
 
+  // ── API helpers ─────────────────────────────────────────────────────────────
+
   const checkMongoStatus = async () => {
     try {
-      const res = await fetch(`${apiBaseUrl}/api/auth/status`);
+      const res = await fetch(`${API_URL}/api/auth/status`);
       if (res.ok) {
         const data = await res.json();
         setMongoStatus({
@@ -84,19 +89,20 @@ export function StudentLogin({
 
   const loadRecentStudents = async () => {
     try {
-      const res = await fetch(`${apiBaseUrl}/api/auth/students`);
+      const res = await fetch(`${API_URL}/api/auth/students`);
       if (res.ok) {
         const data = await res.json();
-        if (data?.students) {
+        if (Array.isArray(data?.students)) {
           setRecentStudents(data.students.slice(0, 5));
         }
       }
     } catch {
-      // ignore
+      // non-critical — ignore
     }
   };
 
-  // Lookup existing student when phone reaches 10 digits
+  // ── Phone lookup on 10-digit entry ─────────────────────────────────────────
+
   const handlePhoneChange = async (val) => {
     const clean = val.replace(/\D/g, '').slice(0, 10);
     setPhone(clean);
@@ -104,105 +110,109 @@ export function StudentLogin({
 
     if (clean.length === 10) {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/auth/lookup`, {
+        const res = await fetch(`${API_URL}/api/auth/lookup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: clean }),
         });
-        const data = await res.json();
-        if (data?.found && data.student) {
-          if (!name) setName(data.student.name || '');
-          if (!niatId) setNiatId(data.student.niatId || '');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.found && data.student) {
+            if (!name) setName(data.student.name || '');
+            if (!niatId) setNiatId(data.student.niatId || '');
+          }
         }
       } catch {
-        // ignore lookup error
+        // lookup failure is non-critical
       }
     }
   };
 
-  // Format NIAT ID automatically (e.g. N26H04A0123)
   const handleNiatIdChange = (val) => {
-    const formatted = val.toUpperCase().trim();
-    setNiatId(formatted);
+    setNiatId(val.toUpperCase().trim());
     setErrorMsg('');
   };
 
-  // Step 1: Send OTP to Phone (with Firebase Phone Auth support + Backend OTP)
+  // ── Step 1: Send OTP via Firebase Phone Auth ────────────────────────────────
+
   const handleSendOtp = async (e) => {
     if (e) e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
+    // Validation
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length !== 10) {
       setErrorMsg('Please enter a valid 10-digit mobile number.');
       return;
     }
-
     if (!name.trim()) {
       setErrorMsg('Please enter your full name.');
       return;
     }
-
     const cleanNiatId = niatId.trim().toUpperCase();
     if (!cleanNiatId) {
       setErrorMsg('Please enter your NIAT Student ID (e.g. N26H04A0123).');
       return;
     }
-
     if (!cleanNiatId.startsWith('N')) {
       setErrorMsg('NIAT Student ID must start with "N" (e.g. N26H04A0123).');
       return;
     }
 
+    // Prevent duplicate rapid sends
+    if (otpSentRef.current && resendTimer > 0) {
+      setErrorMsg(`Please wait ${resendTimer}s before resending.`);
+      return;
+    }
+
     setLoading(true);
+    otpSentRef.current = false;
+
     try {
-      // Attempt Firebase reCAPTCHA Phone Auth if live
-      try {
-        const appVerifier = setupRecaptcha('recaptcha-container');
-        if (appVerifier) {
-          const e164 = `+91${cleanPhone}`;
-          const confirmRes = await sendFirebasePhoneOtp(e164, appVerifier);
-          if (confirmRes) {
-            setConfirmation(confirmRes);
-            setConfirmationResult(confirmRes);
-          }
-        }
-      } catch (fbErr) {
-        // Fallback to backend OTP if Firebase domain / reCAPTCHA needs config
-        console.info('Firebase SMS dispatched via backend gateway:', fbErr.message);
-      }
+      const e164 = `+91${cleanPhone}`;
 
-      // Backend OTP Gateway & MongoDB check
-      const res = await fetch(`${apiBaseUrl}/api/auth/send-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: cleanPhone,
-          name: name.trim(),
-          niatId: cleanNiatId,
-        }),
-      });
+      // Set up invisible reCAPTCHA and send OTP via Firebase
+      const appVerifier = setupRecaptcha('recaptcha-container');
+      const result = await sendFirebasePhoneOtp(e164, appVerifier);
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to dispatch verification OTP. Please try again.');
-      }
-
-      setDemoOtp(data.otp);
-      setSuccessMsg(`Verification code sent to +91 ${cleanPhone}`);
+      setConfirmationResult(result);
+      otpSentRef.current = true;
+      setSuccessMsg(`OTP sent to +91 ${cleanPhone} via SMS.`);
       setStep('otp');
       setResendTimer(60);
     } catch (err) {
-      setErrorMsg(err.message || 'Error generating OTP. Please verify server connection.');
+      console.error('[SendOTP] Firebase error:', err);
+
+      // Provide clear, actionable error messages
+      if (err.code === 'auth/invalid-phone-number') {
+        setErrorMsg('Invalid phone number format. Please enter a valid 10-digit Indian mobile number.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setErrorMsg('Too many OTP requests. This number is temporarily blocked by Firebase. Please wait a few minutes and try again.');
+      } else if (err.code === 'auth/captcha-check-failed') {
+        setErrorMsg('reCAPTCHA verification failed. Please refresh the page and try again.');
+      } else if (err.code === 'auth/quota-exceeded') {
+        setErrorMsg('SMS quota exceeded for this project. Please contact the administrator.');
+      } else if (err.message?.includes('not initialized') || err.message?.includes('env')) {
+        setErrorMsg('Firebase is not configured. Please check that all VITE_FIREBASE_* variables are set in frontend/.env');
+      } else {
+        setErrorMsg(err.message || 'Failed to send OTP. Please try again.');
+      }
+
+      // Reset reCAPTCHA so the user can retry
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch { /* ignore */ }
+        window.recaptchaVerifier = null;
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Verify OTP (Debugged Firebase Confirmation + Profile Fetch + MongoDB Sync)
-  const verifyOTP = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
+  // ── Step 2: Verify OTP ──────────────────────────────────────────────────────
+
+  const handleVerifyOtp = async (e) => {
+    if (e) e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
@@ -212,185 +222,135 @@ export function StudentLogin({
       return;
     }
 
+    if (!confirmationResult) {
+      setErrorMsg('OTP session expired. Please go back and send a new OTP.');
+      return;
+    }
+
     setLoading(true);
+
     try {
-      console.log("Step 1: Starting OTP verification");
+      // Step 1: Confirm the OTP with Firebase — this is the REAL verification
+      const userCredential = await confirmationResult.confirm(cleanOtp);
+      const firebaseUser = userCredential.user;
 
-      let result;
-      const activeConfirm = confirmation || confirmationResult;
+      // Step 2: Get a fresh ID token from Firebase
+      const idToken = await firebaseUser.getIdToken();
 
-      if (activeConfirm && typeof activeConfirm.confirm === 'function') {
-        result = await activeConfirm.confirm(cleanOtp);
-        console.log("Step 2: Firebase OTP verified", result.user.uid);
-      } else {
-        console.log("Step 2: Firebase OTP verified (direct session)", 'firebase_user_id');
-        result = {
-          user: {
-            uid: 'firebase_user_' + (phone.slice(-4) || 'demo'),
-            getIdToken: async () => FIREBASE_AUTH_TOKEN,
-          },
-        };
+      // Step 3: Verify the token with our backend and get the authenticated user
+      const profileRes = await fetch(`${API_URL}/api/auth/profile`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Always read the response body before checking status
+      const profileText = await profileRes.text();
+      let profileData;
+      try {
+        profileData = JSON.parse(profileText);
+      } catch {
+        throw new Error(
+          `Backend returned a non-JSON response (status ${profileRes.status}). ` +
+          'Make sure the backend server is running at ' + API_URL
+        );
       }
 
-      const idToken = await result.user.getIdToken();
-
-      console.log("Step 3: Firebase token received");
-
-      const apiUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || apiBaseUrl || 'http://localhost:5000').replace(/\/+$/, '');
-      const response = await fetch(
-        `${apiUrl}/api/auth/profile`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-
-      console.log("Step 4: Backend status:", response.status);
-
-      const text = await response.text();
-
-      console.log("Step 5: Backend response:", text);
-
-      if (!response.ok) {
-        throw new Error(`Backend error ${response.status}: ${text}`);
+      if (!profileRes.ok) {
+        throw new Error(profileData?.message || `Backend error: ${profileRes.status}`);
       }
 
-      if (!text) {
-        throw new Error("Backend returned an empty response");
-      }
+      // Step 4: Persist the student in MongoDB (upsert with their name + NIAT ID)
+      const cleanPhone = phone.replace(/\D/g, '');
+      const cleanName = name.trim();
+      const cleanNiatId = niatId.trim().toUpperCase();
 
-      const data = JSON.parse(text);
-
-      setUser(data.user);
-      setMessage("Login successful!");
-      setSuccessMsg("Login successful!");
-
-      // Persist student to MongoDB Atlas
-      const cleanPhone = phone.replace(/\D/g, '') || '9876543210';
-      const cleanName = name.trim() || 'Student_' + cleanPhone.slice(-4);
-      const cleanNiatId = niatId.trim().toUpperCase() || 'N26H04A' + cleanPhone.slice(-4);
-
-      const res = await fetch(`${apiUrl}/api/auth/verify-otp`, {
+      const storeRes = await fetch(`${API_URL}/api/auth/store-student`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phone: cleanPhone,
-          otp: cleanOtp,
           name: cleanName,
           niatId: cleanNiatId,
         }),
       });
 
-      const mongoData = await res.json();
+      let studentData = null;
+      if (storeRes.ok) {
+        const storeBody = await storeRes.json();
+        studentData = storeBody?.student || null;
+      }
+
+      // Build the final student object
       const finalStudent = {
-        ...(mongoData?.student || {}),
+        ...(studentData || {}),
         name: cleanName,
         niatId: cleanNiatId,
         phone: cleanPhone,
-        firebaseUid: data.user.uid,
+        firebaseUid: profileData.user?.uid || firebaseUser.uid,
+        phoneNumber: profileData.user?.phoneNumber || `+91${cleanPhone}`,
       };
+
+      setSuccessMsg('Login successful! Redirecting...');
 
       if (onLoginSuccess) {
         onLoginSuccess(finalStudent);
       }
+
       loadRecentStudents();
-
-    } catch (error) {
-      console.error("LOGIN ERROR:", error);
-      setMessage(error.message);
-      setErrorMsg(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = verifyOTP;
-
-  // 1-Click Fast Auth using the user's provided Firebase Token
-  const handleFirebaseTokenAuth = async () => {
-    setLoading(true);
-    setErrorMsg('');
-    try {
-      const fbUser = await authenticateWithFirebaseToken(FIREBASE_AUTH_TOKEN);
-      let idToken = FIREBASE_AUTH_TOKEN;
-      if (fbUser && fbUser.getIdToken) {
-        try {
-          idToken = await fbUser.getIdToken();
-        } catch {
-          // fallback to token
-        }
-      }
-
-      // Verify token through backend route /api/auth/profile
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL || apiBaseUrl}/api/auth/profile`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      const responseText = await response.text();
-      let profileData;
-      try {
-        profileData = JSON.parse(responseText);
-      } catch {
-        throw new Error("Backend returned an empty or invalid JSON response");
-      }
-
-      if (!response.ok) {
-        throw new Error(profileData.message || "Login failed");
-      }
-
-      const targetPhone = phone.length === 10 ? phone : '9876543210';
-      const targetName = name.trim() || 'Aarav Patel';
-      const targetId = niatId.trim().toUpperCase() || 'N26H04A0123';
-
-      const res = await fetch(`${apiBaseUrl}/api/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: targetPhone,
-          otp: '123456',
-          name: targetName,
-          niatId: targetId,
-        }),
-      });
-
-      const data = await res.json();
-      setSuccessMsg("Login successful!");
-      if (data?.student && onLoginSuccess) {
-        onLoginSuccess({
-          ...data.student,
-          firebaseUid: profileData.user?.uid || 'firebase_user_id',
-        });
-      }
     } catch (err) {
-      setErrorMsg(err.message || 'Firebase token verification failed.');
+      console.error('[VerifyOTP] Error:', err);
+
+      if (err.code === 'auth/invalid-verification-code') {
+        setErrorMsg('Incorrect OTP. Please check the code sent to your mobile.');
+      } else if (err.code === 'auth/code-expired') {
+        setErrorMsg('OTP has expired. Please go back and request a new one.');
+        setConfirmationResult(null);
+      } else if (err.code === 'auth/session-expired') {
+        setErrorMsg('Session expired. Please go back and request a new OTP.');
+        setConfirmationResult(null);
+      } else {
+        setErrorMsg(err.message || 'OTP verification failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Quick fill demo student
+  // ── Resend OTP ──────────────────────────────────────────────────────────────
+
+  const handleResendOtp = () => {
+    setOtp('');
+    setConfirmationResult(null);
+    otpSentRef.current = false;
+    setStep('phone');
+    setErrorMsg('');
+    setSuccessMsg('');
+    // A tiny delay so the reCAPTCHA container re-mounts cleanly
+    setTimeout(() => {
+      handleSendOtp();
+    }, 100);
+  };
+
+  // ── Quick fill from recent students list ────────────────────────────────────
+
   const handleQuickFill = (sample) => {
-    setName(sample.name);
-    setNiatId(sample.niatId);
-    setPhone(sample.phone);
+    setName(sample.name || '');
+    setNiatId(sample.niatId || '');
+    setPhone(sample.phone || '');
     setErrorMsg('');
   };
 
-  // IF CURRENTLY LOGGED IN: SHOW STUDENT PROFILE & DASHBOARD QUICK ACCESS
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RENDER: Logged-in student profile
+  // ═══════════════════════════════════════════════════════════════════════════
+
   if (currentStudent) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#070b14]">
         <div className="w-full max-w-lg glass-panel p-8 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden">
-          {/* Top academic sapphire line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500" />
 
           {/* Header */}
@@ -406,17 +366,15 @@ export function StudentLogin({
                     Verified
                   </span>
                 </h2>
-                <p className="text-xs text-slate-400">Authenticated via Firebase & Phone OTP</p>
+                <p className="text-xs text-slate-400">Authenticated via Firebase Phone OTP</p>
               </div>
             </div>
-
-            {/* Badges */}
             <div className="flex flex-col items-end gap-1">
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
-                Firebase Connected
+                Firebase ✓
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                MongoDB Synced
+                {mongoStatus.connected ? 'MongoDB Synced' : 'Local Backup'}
               </span>
             </div>
           </div>
@@ -425,15 +383,11 @@ export function StudentLogin({
           <div className="my-6 p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col gap-4">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Student Name
-                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Student Name</span>
                 <h3 className="text-lg font-bold text-white">{currentStudent.name}</h3>
               </div>
               <div className="text-right">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  NIAT Student ID
-                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">NIAT Student ID</span>
                 <p className="text-sm font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/30">
                   {currentStudent.niatId}
                 </p>
@@ -479,13 +433,18 @@ export function StudentLogin({
     );
   }
 
-  // LOGIN SCREEN (MANDATORY GATEWAY OR DIRECT LOGIN)
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RENDER: Login form
+  // ═══════════════════════════════════════════════════════════════════════════
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#070b14] relative min-h-[calc(100vh-60px)]">
+      {/* Invisible reCAPTCHA container — Firebase requires this div to exist in the DOM */}
       <div id="recaptcha-container"></div>
 
       <div className="w-full max-w-md glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-2xl relative z-10">
-        {/* Top Institutional Badge */}
+
+        {/* Top Badge */}
         <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-800 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
@@ -496,12 +455,12 @@ export function StudentLogin({
               Firebase OTP
             </span>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">
-              MongoDB
+              {mongoStatus.checked ? (mongoStatus.connected ? 'MongoDB ✓' : 'Local Fallback') : 'MongoDB...'}
             </span>
           </div>
         </div>
 
-        {/* Mandatory Barrier Alert */}
+        {/* Mandatory barrier notice */}
         {isMandatoryBarrier && (
           <div className="mb-5 p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs flex items-start gap-2.5">
             <Lock className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
@@ -514,7 +473,7 @@ export function StudentLogin({
           </div>
         )}
 
-        {/* Portal Branding */}
+        {/* Branding */}
         <div className="text-center mb-6">
           <div className="w-13 h-13 mx-auto rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/25 mb-3">
             <GraduationCap className="w-7 h-7 text-white" />
@@ -523,18 +482,17 @@ export function StudentLogin({
             Student <span className="text-blue-400">Portal Login</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
-            Authenticate using your Name, NIAT ID & Phone OTP
+            Verify your identity with your Name, NIAT ID & mobile OTP
           </p>
         </div>
 
-        {/* Alerts / Error / Success */}
+        {/* Error / Success alerts */}
         {errorMsg && (
           <div className="mb-4 p-3 rounded-xl bg-red-950/30 border border-red-500/40 text-red-300 text-xs flex items-start gap-2">
-            <span className="font-bold text-red-400 mt-0.5">!</span>
+            <span className="font-bold text-red-400 mt-0.5 shrink-0">!</span>
             <span>{errorMsg}</span>
           </div>
         )}
-
         {successMsg && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
             <Check className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -542,22 +500,20 @@ export function StudentLogin({
           </div>
         )}
 
-        {/* STEP 1: PHONE, NAME & NIAT ID */}
+        {/* ── STEP 1: Phone, Name, NIAT ID ───────────────────────────────── */}
         {step === 'phone' && (
           <form onSubmit={handleSendOtp} className="space-y-4">
+
             {/* Student Name */}
             <div>
               <label className="block text-xs font-semibold text-slate-200 mb-1.5 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-blue-400" />
-                <span>Student Full Name</span>
+                Student Full Name
               </label>
               <input
                 type="text"
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  setErrorMsg('');
-                }}
+                onChange={(e) => { setName(e.target.value); setErrorMsg(''); }}
                 placeholder="e.g. Rahul Sharma"
                 required
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-white placeholder-slate-500 transition-all outline-none"
@@ -569,7 +525,7 @@ export function StudentLogin({
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                   <IdCard className="w-3.5 h-3.5 text-blue-400" />
-                  <span>NIAT Student ID</span>
+                  NIAT Student ID
                 </label>
                 <span className="text-[10px] text-blue-300 font-mono bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
                   Format: N26H04A0123
@@ -585,14 +541,14 @@ export function StudentLogin({
               />
             </div>
 
-            {/* Phone Number */}
+            {/* Mobile Number */}
             <div>
               <label className="block text-xs font-semibold text-slate-200 mb-1.5 flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Mobile Number (SMS OTP)</span>
+                Mobile Number (SMS OTP)
               </label>
               <div className="flex rounded-xl bg-slate-900 border border-slate-700 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden transition-all">
-                <span className="px-3.5 py-2.5 bg-slate-800 text-slate-200 text-sm font-semibold border-r border-slate-700 flex items-center gap-1">
+                <span className="px-3.5 py-2.5 bg-slate-800 text-slate-200 text-sm font-semibold border-r border-slate-700 flex items-center">
                   +91
                 </span>
                 <input
@@ -605,44 +561,12 @@ export function StudentLogin({
                   className="w-full px-4 py-2.5 bg-transparent text-sm text-white placeholder-slate-500 outline-none"
                 />
               </div>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Firebase will send a real SMS OTP to this number.
+              </p>
             </div>
 
-            {/* Quick Demo Pre-fill for Instant Testing */}
-            <div className="pt-1">
-              <span className="text-[11px] text-slate-400">Quick Test Credentials:</span>
-              <div className="flex flex-wrap gap-2 mt-1.5">
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleQuickFill({
-                      name: 'Aarav Patel',
-                      niatId: 'N26H04A0123',
-                      phone: '9876543210',
-                    })
-                  }
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] border border-slate-700 flex items-center gap-1 transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-3 h-3 text-blue-400" />
-                  <span>Aarav (N26H04A0123)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleQuickFill({
-                      name: 'Sneha Reddy',
-                      niatId: 'N26H04A0456',
-                      phone: '9845012345',
-                    })
-                  }
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] border border-slate-700 flex items-center gap-1 transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-3 h-3 text-emerald-400" />
-                  <span>Sneha (N26H04A0456)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Submit Button */}
+            {/* Send OTP Button */}
             <button
               type="submit"
               disabled={loading}
@@ -651,38 +575,52 @@ export function StudentLogin({
               {loading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Dispatching OTP...</span>
+                  <span>Sending OTP via Firebase...</span>
                 </>
               ) : (
                 <>
                   <Phone className="w-4 h-4" />
-                  <span>Send Verification Code</span>
+                  <span>Send OTP to Mobile</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </>
               )}
             </button>
 
-            {/* Firebase Custom Token Fast Sign-in */}
-            <button
-              type="button"
-              onClick={handleFirebaseTokenAuth}
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white font-medium text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-              <span>Instant Sign-In with Firebase Token</span>
-            </button>
+            {/* Recent students quick-fill */}
+            {recentStudents.length > 0 && (
+              <div className="pt-4 border-t border-slate-800">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">
+                  Recent Students:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {recentStudents.map((std, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleQuickFill(std)}
+                      className="px-2 py-1 rounded-md bg-slate-900 border border-slate-800 hover:border-blue-500/60 text-[11px] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="text-blue-400 font-mono font-semibold">{std.niatId}</span>
+                      <span className="text-slate-500">•</span>
+                      <span>{std.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </form>
         )}
 
-        {/* STEP 2: VERIFY OTP */}
+        {/* ── STEP 2: OTP Verification ────────────────────────────────────── */}
         {step === 'otp' && (
-          <form onSubmit={verifyOTP} className="space-y-5">
-            {/* Target Information Card */}
+          <form onSubmit={handleVerifyOtp} className="space-y-5">
+
+            {/* Target Info */}
             <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-400">Verifying Mobile</p>
+                <p className="text-xs text-slate-400">OTP sent to</p>
                 <p className="text-sm font-semibold text-white">+91 {phone}</p>
-                <p className="text-[11px] text-blue-400 font-mono mt-0.5">{niatId} &bull; {name}</p>
+                <p className="text-[11px] text-blue-400 font-mono mt-0.5">{niatId} • {name}</p>
               </div>
               <button
                 type="button"
@@ -690,34 +628,14 @@ export function StudentLogin({
                   setStep('phone');
                   setErrorMsg('');
                   setSuccessMsg('');
+                  setConfirmationResult(null);
+                  otpSentRef.current = false;
                 }}
                 className="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer"
               >
                 Change
               </button>
             </div>
-
-            {/* OTP Preview Box */}
-            {demoOtp && (
-              <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-500/40 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-blue-300 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-blue-400" />
-                    SMS OTP Code
-                  </span>
-                  <p className="text-xs text-slate-200 mt-0.5">
-                    Your One-Time Password: <strong className="text-white font-mono text-sm tracking-widest">{demoOtp}</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setOtp(demoOtp)}
-                  className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow cursor-pointer shrink-0 ml-2"
-                >
-                  Auto Fill
-                </button>
-              </div>
-            )}
 
             {/* OTP Input */}
             <div>
@@ -726,6 +644,8 @@ export function StudentLogin({
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={otp}
                 onChange={(e) => {
                   const clean = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -738,33 +658,43 @@ export function StudentLogin({
                 required
                 className="w-full text-center tracking-[0.5em] font-mono text-2xl py-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white placeholder-slate-600 transition-all outline-none"
               />
-              <p className="text-[11px] text-slate-400 text-center mt-1.5">
-                Universal test code: <span className="font-mono text-blue-400 font-bold">123456</span>
+              <p className="text-[11px] text-slate-500 text-center mt-1.5">
+                Check your SMS for the 6-digit code from Firebase.
               </p>
             </div>
 
-            {/* Resend and Actions */}
+            {/* Resend / Back row */}
             <div className="flex items-center justify-between text-xs pt-1">
               <button
                 type="button"
-                onClick={() => setStep('phone')}
+                onClick={() => {
+                  setStep('phone');
+                  setErrorMsg('');
+                  setSuccessMsg('');
+                  setConfirmationResult(null);
+                  otpSentRef.current = false;
+                }}
                 className="text-slate-400 hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back</span>
+                Back
               </button>
 
-              <button
-                type="button"
-                disabled={resendTimer > 0 || loading}
-                onClick={handleSendOtp}
-                className="text-blue-400 hover:text-blue-300 disabled:text-slate-500 font-semibold transition-colors cursor-pointer"
-              >
-                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-              </button>
+              {resendTimer > 0 ? (
+                <span className="text-slate-500">Resend in {resendTimer}s</span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleResendOtp}
+                  className="text-blue-400 hover:text-blue-300 font-semibold transition-colors cursor-pointer disabled:text-slate-500"
+                >
+                  Resend OTP
+                </button>
+              )}
             </div>
 
-            {/* Verify & Login Button */}
+            {/* Verify Button */}
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
@@ -773,40 +703,18 @@ export function StudentLogin({
               {loading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Verifying via Firebase & MongoDB...</span>
+                  <span>Verifying with Firebase...</span>
                 </>
               ) : (
                 <>
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Verify OTP & Unlock Portal</span>
+                  <span>Verify OTP & Sign In</span>
                 </>
               )}
             </button>
           </form>
         )}
 
-        {/* Recent Registered Students Section */}
-        {recentStudents.length > 0 && (
-          <div className="mt-6 pt-5 border-t border-slate-800 text-xs">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">
-              Registered Students in MongoDB:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {recentStudents.map((std, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleQuickFill(std)}
-                  className="px-2 py-1 rounded-md bg-slate-900 border border-slate-800 hover:border-blue-500/60 text-[11px] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1"
-                >
-                  <span className="text-blue-400 font-mono font-semibold">{std.niatId}</span>
-                  <span className="text-slate-500">&bull;</span>
-                  <span>{std.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
