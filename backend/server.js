@@ -3,7 +3,15 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 import 'dotenv/config';
+import { connectDB, getMongoStatus } from './db.js';
+import {
+  sendOtpService,
+  verifyOtpService,
+  lookupStudentService,
+  getAllStudentsService,
+} from './authService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -269,10 +277,77 @@ app.post('/api/admin/update-teacher', (req, res) => {
   res.json({ success: true, subject: db.subjects[idx] });
 });
 
-// POST /api/admin/upload-audio  (multipart — handled via multer)
-// Using multer for file uploads
-import multer from 'multer';
+// ─── AUTHENTICATION & MONGODB ROUTES ────────────────────────────────────────
 
+// Check MongoDB and Auth Status
+app.get('/api/auth/status', (_req, res) => {
+  const status = getMongoStatus();
+  res.json({
+    success: true,
+    mongo: status,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// POST /api/auth/send-otp
+// Request body: { phone, name, niatId }
+app.post('/api/auth/send-otp', async (req, res) => {
+  try {
+    const { phone, name, niatId } = req.body;
+    const result = await sendOtpService({ phone, name, niatId });
+    res.json({
+      success: true,
+      message: `OTP sent successfully to +91 ${result.phone}`,
+      phone: result.phone,
+      otp: result.otp, // Returned for instant testing and demonstration
+      expiresInSeconds: result.expiresInSeconds,
+      mongoConnected: result.mongoConnected,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/auth/verify-otp
+// Request body: { phone, otp, name, niatId }
+app.post('/api/auth/verify-otp', async (req, res) => {
+  try {
+    const { phone, otp, name, niatId } = req.body;
+    const result = await verifyOtpService({ phone, otp, name, niatId });
+    res.json({
+      success: true,
+      message: 'Student verified and logged in successfully!',
+      student: result.student,
+      mongoConnected: result.mongoConnected,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/auth/lookup
+// Request body: { phone, niatId }
+app.post('/api/auth/lookup', async (req, res) => {
+  try {
+    const { phone, niatId } = req.body;
+    const result = await lookupStudentService({ phone, niatId });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/auth/students (List registered students)
+app.get('/api/auth/students', async (_req, res) => {
+  try {
+    const students = await getAllStudentsService();
+    res.json({ success: true, count: students.length, students });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/admin/upload-audio  (multipart — handled via multer)
 const uploadDir = path.join(__dirname, 'public', 'uploads', 'teachers');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -294,7 +369,8 @@ app.use((_req, res) => {
 });
 
 // ─── START ───────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ NIAT Backend (Express) running on port ${PORT}`);
   console.log(`   CORS origins: ${ALLOWED_ORIGINS.join(', ')}`);
+  await connectDB();
 });

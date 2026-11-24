@@ -1,17 +1,20 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   GraduationCap, Mic, MicOff, Volume2, Send, Upload, Sparkles,
   ChevronRight, ArrowLeft, Code, Play, Pause, ShieldCheck,
-  RefreshCw, Flame, Terminal, Download, ExternalLink, MessageSquare, Youtube, Search
+  RefreshCw, Flame, Terminal, Download, ExternalLink, MessageSquare, Youtube, Search,
+  Phone, User, Lock, LogOut, Database, IdCard
 } from './icons.jsx';
 import { fallbackSubjects } from './data.js';
 import { voiceEnhancer, speakWithClonedTeacherVoice } from './audioEnhancer.js';
 import { AIAgentTeacherEngine } from './aiAgentEngine.js';
 import { MayaInteractiveAvatar } from './MayaAvatar.jsx';
 import { YouTubeHUDPlayer } from './YouTubeHUDPlayer.jsx';
+import { StudentLogin } from './StudentLogin.jsx';
 
 import { generateElevenLabsSpeech, cloneVoiceWithAudio } from './elevenLabsService.js';
 import { elevenLabsAgent } from './elevenLabsAgent.js';
+
 
 
 
@@ -65,6 +68,37 @@ export function App() {
   const [llmProvider, setLlmProvider] = useState(() => {
     return localStorage.getItem('niat_llm_provider') || 'pollinations';
   });
+
+  // Student Authentication state (persisted in localStorage)
+  const [currentStudent, setCurrentStudent] = useState(() => {
+    try {
+      const saved = localStorage.getItem('niat_student');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleLoginSuccess = (student) => {
+    setCurrentStudent(student);
+    try {
+      localStorage.setItem('niat_student', JSON.stringify(student));
+    } catch (e) {
+      console.warn('Could not save student to localStorage', e);
+    }
+    setActiveTab('subjects');
+  };
+
+  const handleLogout = () => {
+    setCurrentStudent(null);
+    try {
+      localStorage.removeItem('niat_student');
+    } catch (e) {
+      console.warn('Could not clear localStorage', e);
+    }
+    setActiveTab('landing');
+  };
+
 
   const populateAdminForm = (s) => {
     setAdminSelectedSubject(s.id);
@@ -584,6 +618,13 @@ export function App() {
             AI Chatroom
           </button>
           <button
+            onClick={() => setActiveTab('login')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'login' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+          >
+            <User className="w-3.5 h-3.5 text-purple-400" />
+            {currentStudent ? 'Student Account' : 'Student Login'}
+          </button>
+          <button
             onClick={() => setActiveTab('admin')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'admin' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
           >
@@ -594,7 +635,33 @@ export function App() {
 
         {/* User quick status & Start button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
+          {currentStudent ? (
+            <div
+              onClick={() => setActiveTab('login')}
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-purple-500/30 hover:border-purple-400 cursor-pointer transition-all shadow-sm group"
+              title="Click to view student account or logout"
+            >
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white uppercase shadow">
+                {currentStudent.name ? currentStudent.name[0] : 'S'}
+              </div>
+              <div className="text-left hidden sm:block leading-tight">
+                <p className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">
+                  {currentStudent.name}
+                </p>
+                <p className="text-[10px] font-mono text-purple-400">{currentStudent.niatId}</p>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setActiveTab('login')}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/40 text-purple-200 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+            >
+              <User className="w-3.5 h-3.5 text-purple-400" />
+              <span>Student Login (OTP)</span>
+            </button>
+          )}
+
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Teacher Voice Engine Online</span>
           </div>
@@ -640,6 +707,15 @@ export function App() {
                     <span>Start Learning</span>
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
+
+                  <button
+                    onClick={() => setActiveTab('login')}
+                    className="px-6 py-3.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 text-purple-200 font-semibold border border-purple-500/40 transition-all flex items-center gap-2 text-sm cursor-pointer shadow-lg shadow-purple-900/20"
+                  >
+                    <IdCard className="w-4 h-4 text-purple-400" />
+                    <span>{currentStudent ? `Student: ${currentStudent.niatId}` : 'Student Login (Phone OTP)'}</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       const math = subjects.find(s => s.id === 'mathematics') || subjects[2];
@@ -989,6 +1065,17 @@ export function App() {
           </div>
         )}
 
+        {/* TAB: STUDENT LOGIN & OTP AUTHENTICATION */}
+        {activeTab === 'login' && (
+          <StudentLogin
+            apiBaseUrl={API_BASE_URL}
+            currentStudent={currentStudent}
+            onLoginSuccess={handleLoginSuccess}
+            onLogout={handleLogout}
+            onNavigateHome={() => setActiveTab('subjects')}
+          />
+        )}
+
         {/* TAB 2: STUDENT DASHBOARD */}
         {activeTab === 'dashboard' && (
           <div className="max-w-6xl mx-auto px-6 py-8 w-full flex-1">
@@ -996,12 +1083,26 @@ export function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-white">Student Learning Hub</h2>
-                  <p className="text-xs text-slate-400">Welcome back, NIAT Scholar. Continue clarifying doubts with your faculty.</p>
+                  <p className="text-xs text-slate-400">
+                    {currentStudent
+                      ? `Welcome back, ${currentStudent.name} (${currentStudent.niatId}). Continue clarifying doubts with your faculty.`
+                      : 'Welcome back, NIAT Scholar. Continue clarifying doubts with your faculty.'}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-purple-400 text-sm">
-                    NS
+                <div
+                  onClick={() => setActiveTab('login')}
+                  className="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-purple-500 transition-all shadow"
+                  title="Click to view student profile or logout"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow">
+                    {currentStudent?.name ? currentStudent.name[0] : 'NS'}
                   </div>
+                  {currentStudent && (
+                    <div className="hidden sm:block text-left pr-2">
+                      <p className="text-xs font-bold text-white leading-none">{currentStudent.name}</p>
+                      <p className="text-[10px] font-mono text-purple-400 leading-none mt-1">{currentStudent.niatId}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
