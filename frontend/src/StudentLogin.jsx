@@ -56,6 +56,7 @@ export function StudentLogin({
   const [confirmationResult, setConfirmationResult] = useState(null);
   const otpSentRef      = useRef(false);
   const verifierRef     = useRef(null);
+  const renderPromiseRef = useRef(null);   // tracks verifier.render() promise
   const isRenderedRef   = useRef(false);  // guards StrictMode double-mount
 
   // ── email specific ─────────────────────────────────────────────────────────
@@ -66,11 +67,15 @@ export function StudentLogin({
   const [mongoStatus, setMongoStatus] = useState({ connected: false, checked: false });
   const [recentStudents, setRecentStudents] = useState([]);
 
+  // With Vite's proxy configured (vite.config.js), all /api/* calls from the
+  // browser are automatically forwarded to http://localhost:5000.
+  // Using '' (relative) means the proxy works in dev; in production set
+  // VITE_API_URL to the deployed backend URL.
   const API_URL = (
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
     apiBaseUrl ||
-    'http://localhost:5000'
+    ''
   ).replace(/\/+$/, '');
 
   // ── reCAPTCHA setup and cleanup ───────────────────────────────────────────
@@ -166,6 +171,7 @@ export function StudentLogin({
       try { verifierRef.current.clear(); } catch {}
       verifierRef.current = null;
       isRenderedRef.current = false;
+      renderPromiseRef.current = null;
       const container = document.getElementById('recaptcha-container');
       if (container) container.innerHTML = '';
     }
@@ -396,7 +402,11 @@ export function StudentLogin({
     setSuccessMsg('');
     if (verifierRef.current) {
       try { verifierRef.current.clear(); } catch {}
-      verifierRef.current = renderPromiseRef.current = null;
+      verifierRef.current = null;
+      renderPromiseRef.current = null;
+      isRenderedRef.current = false;
+      const container = document.getElementById('recaptcha-container');
+      if (container) container.innerHTML = '';
     }
     setTimeout(handleSendPhoneOtp, 100);
   };
@@ -591,6 +601,9 @@ export function StudentLogin({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#070b14] relative min-h-[calc(100vh-60px)]">
+
+      {/* reCAPTCHA container — Firebase attaches the invisible/normal widget here */}
+      <div id="recaptcha-container"></div>
 
       <div className="w-full max-w-md glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-2xl relative z-10">
 
